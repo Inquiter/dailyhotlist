@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<title>今日热榜</title>
+		<meta charset="UTF-8"/>
+		<link rel="icon" type="image/x-icon" th:href="@{/img/ico/dailyhotlist.ico}"/>
+		<script type="text/javascript" th:src="@{/js/jquery-3.7.0.min.js}"></script>
+		<script type="text/javascript" th:src="@{/bootstrap-3.3.7-dist/js/bootstrap.min.js}"></script>
+		<link rel="stylesheet" th:href="@{/bootstrap-3.3.7-dist/css/bootstrap.min.css}">
+		<link rel="stylesheet" th:href="@{/css/index.css}"/>
+		<script th:inline="javascript">
+            document.onreadystatechange = function () {
+                if (document.readyState === "complete") document.body.style.display = "block";
+                else document.body.style.display = "none";
+            };
+
+            window.onload = function () {
+                let userMsg = '[[${userLoginMsg}]]'.replaceAll("\"", "");
+                if (userMsg !== 'null')
+                    if (userMsg.indexOf("成功") !== -1) showMessage(userMsg, 'success');
+                    else showMessage(userMsg, 'warning');
+                userMsg = '[[${userRegisterMsg}]]'.replaceAll("\"", "");
+                if (userMsg !== 'null')
+                    if (userMsg.indexOf("成功") !== -1) showMessage(userMsg, 'success');
+                    else showMessage(userMsg, 'warning');
+                let hotListSubTitleWhole = document.getElementsByClassName("hot-list-sub-title-whole-css")[0],
+                    hotListSubTitleContentWhole = document.getElementsByClassName("hot-list-sub-title-content-whole-css")[0],
+                    hotListScrollTop = document.getElementsByClassName("hot-list-scroll-top-css")[0];
+                hotListSubTitleWhole.onwheel = function (event) {
+                    this.scrollLeft += event.deltaY < 0 ? -100 : 100;
+                };
+                hotListSubTitleContentWhole.onscroll = function () {
+                    if (this.scrollTop > 500) hotListScrollTop.removeAttribute("hidden");
+                    else hotListScrollTop.setAttribute("hidden", "hidden");
+                    const hotListSubTitleContents = document.getElementsByClassName("hot-list-sub-title-content-css");
+                    for (let i = 0; i < hotListSubTitleContents.length; i++) if (hotListSubTitleContents[i].style.display === "block") {
+                        lazyLoad(hotListSubTitleContentWhole, hotListSubTitleContents[i].getElementsByClassName("hot-list-content-one"));
+                        break;
+                    }
+                };
+                if (document.getElementsByClassName("subscribe-sub-title-whole-css").length > 0) {
+                    let subscribeSubTitleWhole = document.getElementsByClassName("subscribe-sub-title-whole-css")[0],
+                        subscribeSubTitleContentWhole = document.getElementsByClassName("subscribe-sub-title-content-whole-css")[0],
+                        subscribeScrollTop = document.getElementsByClassName("subscribe-scroll-top-css")[0];
+                    subscribeSubTitleWhole.onwheel = function (event) {
+                        this.scrollLeft += event.deltaY < 0 ? -100 : 100;
+                    };
+                    subscribeSubTitleContentWhole.onscroll = function () {
+                        if (this.scrollTop > 500) subscribeScrollTop.removeAttribute("hidden");
+                        else subscribeScrollTop.setAttribute("hidden", "hidden");
+                        const subscribeSubTitleContents = document.getElementsByClassName("subscribe-sub-title-content-css");
+                        for (let i = 0; i < subscribeSubTitleContents.length; i++) if (subscribeSubTitleContents[i].style.display === "block") {
+                            lazyLoad(subscribeSubTitleContentWhole, subscribeSubTitleContents[i].getElementsByClassName("subscribe-content-one"));
+                            break;
+                        }
+                    };
+                    if (document.getElementsByClassName("subscribe-sub-title-css").length > 0) showSubscribeSubTitleContent(0);
+                }
+                showTitleContent(0);
+                showHotListSubTitleContent(0);
+            }
+
+            function showMessage(msg, type) {
+                const divElement = $("<div></div>").addClass('alert').addClass('alert-' + type).addClass('alert-dismissible').addClass('col-md-4');
+                divElement.css({
+                    "position": "absolute",
+                    "top": "5vh",
+                    "height": "6vh",
+                    "padding-top": "1.5vh",
+                    "border": "none",
+                    "text-align": "center",
+                    "background-color": type === "success" ? "rgb(218, 255, 206)" : type === "warning" ? "rgb(255, 252, 192)" : type === "danger" ? "rgb(255,183,183)" : "rgb(255, 255, 255)",
+                    "font-size": "2vh",
+                    "font-family": "Microsoft YaHei",
+                    "margin-left": "36vw",
+                });
+                divElement.text(msg);
+                $('body').append(divElement);
+                let isIn = false;
+                divElement.on({
+                    mouseover: function () {
+                        isIn = true;
+                    },
+                    mouseout: function () {
+                        isIn = false;
+                    }
+                });
+                setTimeout(function () {
+                    const IntervalMS = 30; //每次上浮的间隔毫秒
+                    const floatSpace = document.body.clientHeight * 0.03; //上浮的空间(vh)
+                    let nowTop = divElement.offset().top;   //获取元素当前的top值
+                    const stopTop = nowTop - floatSpace;    //上浮停止时的top值
+                    divElement.fadeOut(IntervalMS * floatSpace); //设置元素淡出
+                    let upFloat = setInterval(function () { //开始上浮
+                        if (nowTop >= stopTop) { //判断当前消息框top是否还在可上升的范围内
+                            divElement.css({"top": nowTop--}); //消息框的top上升1px
+                        } else {
+                            clearInterval(upFloat); //关闭上浮
+                            divElement.remove();    //移除元素
+                        }
+                    }, IntervalMS);
+                    if (isIn) { //如果鼠标在setTimeout之前已经放在的消息框中，则停止上浮
+                        clearInterval(upFloat);
+                        divElement.stop();
+                    }
+                    divElement.hover(function () { //鼠标悬浮时停止上浮和淡出效果，过后恢复
+                        clearInterval(upFloat);
+                        divElement.stop();
+                    }, function () {
+                        divElement.fadeOut(IntervalMS * (nowTop - stopTop)); // 这里设置元素淡出的时间应该为：间隔毫秒*剩余可以上浮空间
+                        upFloat = setInterval(function () { // 继续上浮
+                            if (nowTop >= stopTop) {
+                                divElement.css({"top": nowTop--});
+                            } else {
+                                clearInterval(upFloat); // 关闭上浮
+                                divElement.remove();    // 移除元素
+                            }
+                        }, IntervalMS);
+                    });
+                }, 2000);
+            }
+
+            function lazyLoad(subTitleContentWhole, contents) {
+                if (subTitleContentWhole.scrollTop + subTitleContentWhole.clientHeight >= subTitleContentWhole.scrollHeight - 10) {
+                    let index = 0;
+                    while (index < contents.length) if (contents[index].hidden) break; else index++;
+                    if (index < contents.length) for (let i = index; i < index + 10 && i < contents.length; i++) contents[i].hidden = false;
+                }
+            }
+
+            function showTitleContent(number) {
+                if (number === 1 && document.getElementById("subscribe-content").hidden) exitManage();
+                const titles = document.getElementsByClassName("title-css");
+                const titleContents = document.getElementsByClassName("title-content-css");
+                for (let i = 0; i < titles.length; i++) {
+                    if (i === parseInt(number)) {
+                        titles[i].classList.add("active");
+                        titleContents[i].style.display = "block";
+                    } else {
+                        titles[i].classList.remove("active");
+                        titleContents[i].style.display = "none";
+                    }
+                }
+            }
+
+            function showHotListSubTitleContent(number) {
+                const subTitles = document.getElementsByClassName("hot-list-sub-title-css");
+                const subTitleContents = document.getElementsByClassName("hot-list-sub-title-content-css");
+                for (let i = 0; i < subTitles.length; i++) {
+                    if (i === parseInt(number)) {
+                        subTitles[i].classList.add("active");
+                        subTitleContents[i].style.display = "block";
+                    } else {
+                        subTitles[i].classList.remove("active");
+                        subTitleContents[i].style.display = "none";
+                    }
+                }
+                lazyLoad(document.getElementsByClassName("hot-list-sub-title-content-whole-css")[0], subTitleContents[number].getElementsByClassName("hot-list-content-one"));
+                hotListSubTitleContentScrollTop();
+            }
+
+            function showSubscribeSubTitleContent(number) {
+                const subTitles = document.getElementsByClassName("subscribe-sub-title-css");
+                const subTitleContents = document.getElementsByClassName("subscribe-sub-title-content-css");
+                for (let i = 0; i < subTitles.length; i++) {
+                    if (i === parseInt(number)) {
+                        subTitles[i].classList.add("active");
+                        subTitleContents[i].style.display = "block";
+                    } else {
+                        subTitles[i].classList.remove("active");
+                        subTitleContents[i].style.display = "none";
+                    }
+                }
+                lazyLoad(document.getElementsByClassName("subscribe-sub-title-content-whole-css")[0], subTitleContents[number].getElementsByClassName("subscribe-content-one"));
+                subscribeSubTitleContentScrollTop();
+            }
+
+            function hotListSubTitleContentScrollTop() {
+                document.getElementsByClassName("hot-list-sub-title-content-whole-css")[0].scrollTop = 0;
+            }
+
+            function subscribeSubTitleContentScrollTop() {
+                document.getElementsByClassName("subscribe-sub-title-content-whole-css")[0].scrollTop = 0;
+            }
+
+            function manageSubscribe() {
+                document.getElementById("subscribe-content").setAttribute("hidden", "hidden");
+                document.getElementById("subscribe-manage").removeAttribute("hidden");
+            }
+
+            function manage() {
+                const topPlatforms = document.getElementById("subscribe-manage-top-platform-whole").getElementsByClassName("subscribe-manage-platform-css"),
+                    bottomPlatforms = document.getElementById("subscribe-manage-bottom-platform-whole").getElementsByClassName("subscribe-manage-platform-css");
+                for (let i = 0; i < topPlatforms.length; i++) {
+                    for (let j = 0; j < bottomPlatforms.length; j++) if (bottomPlatforms[j].innerText === topPlatforms[i].innerText) bottomPlatforms[j].style.display = "none";
+                    topPlatforms[i].innerHTML += "<div class='subscribe-manage-top-half-ico-css float-left'>✖</div>";
+                }
+                for (let i = 0; i < bottomPlatforms.length; i++) bottomPlatforms[i].innerHTML += "<div class='subscribe-manage-bottom-half-ico-css float-left'>✚</div>";
+                exitManage = function () {
+                    const topPlatforms = document.getElementById("subscribe-manage-top-platform-whole").getElementsByClassName("subscribe-manage-platform-css"),
+                        bottomPlatforms = document.getElementById("subscribe-manage-bottom-platform-whole").getElementsByClassName("subscribe-manage-platform-css");
+                    for (let i = 0; i < topPlatforms.length; i++) {
+                        for (let j = 0; j < bottomPlatforms.length; j++) if (bottomPlatforms[j].style.display === "none") bottomPlatforms[j].style.display = "inline-block";
+                        topPlatforms[i].removeChild(topPlatforms[i].getElementsByClassName("subscribe-manage-top-half-ico-css")[0]);
+                    }
+                    for (let i = 0; i < bottomPlatforms.length; i++) bottomPlatforms[i].removeChild(bottomPlatforms[i].getElementsByClassName("subscribe-manage-bottom-half-ico-css")[0]);
+                    document.getElementsByClassName("subscribe-manage-button-css")[1].style.display = "none";
+                    document.getElementsByClassName("subscribe-manage-button-css")[0].style.display = "inline-block";
+                    exitManage = function () {
+                        document.getElementById("subscribe-manage").setAttribute("hidden", "hidden");
+                        document.getElementById("subscribe-content").removeAttribute("hidden");
+                    }
+                }
+                document.getElementsByClassName("subscribe-manage-button-css")[0].style.display = "none";
+                document.getElementsByClassName("subscribe-manage-button-css")[1].style.display = "inline-block";
+            }
+
+            function addSubscribe(bottomPlatformId) {
+                if (document.getElementsByClassName("subscribe-manage-button-css")[1].style.display === "inline-block") {
+                    if (document.getElementById("subscribe-manage-top-platform-whole").getElementsByClassName("subscribe-manage-platform-none-css").length === 1) document.getElementById("subscribe-manage-top-platform-whole").removeChild(document.getElementById("subscribe-manage-top-platform-whole").getElementsByClassName("subscribe-manage-platform-none-css")[0]);
+                    document.getElementsByClassName("subscribe-manage-top-half-css")[0].getElementsByClassName("subscribe-manage-platform-css");
+                    let bottomPlatform = document.getElementById(bottomPlatformId),
+                        topPlatforms = document.getElementById("subscribe-manage-top-platform-whole").getElementsByClassName("subscribe-manage-platform-css"),
+                        index = 1;
+                    bottomPlatform.style.display = "none";
+                    for (let i = 0; i < topPlatforms.length; i++)
+                        if (topPlatforms[i].getAttribute("id") === "subscribe-manage-top-platform-" + index) {
+                            index++;
+                            i = -1;
+                        }
+                    document.getElementById("subscribe-manage-top-platform-whole").innerHTML += "<div id='subscribe-manage-top-platform-" + index + "' class='subscribe-manage-platform-css float-left' onclick=\"removeSubscribe('subscribe-manage-top-platform-" + index + "')\">" +
+                        "<div class='float-left'>" + bottomPlatform.getElementsByClassName("float-left")[0].innerText + "</div>" +
+                        "<div class='subscribe-manage-top-half-ico-css float-left'>✖</div>" +
+                        "</div>";
+                }
+            }
+
+            function removeSubscribe(topPlatformId) {
+                if (document.getElementsByClassName("subscribe-manage-button-css")[1].style.display === "inline-block") {
+                    const topPlatform = document.getElementById(topPlatformId),
+                        bottomPlatforms = document.getElementsByClassName("subscribe-manage-bottom-half-css")[0].getElementsByClassName("subscribe-manage-platform-css");
+                    for (let i = 0; i < bottomPlatforms.length; i++)
+                        if (bottomPlatforms[i].style.display === "none" && bottomPlatforms[i].getElementsByClassName("float-left")[0].innerText === topPlatform.getElementsByClassName("float-left")[0].innerText) {
+                            bottomPlatforms[i].style.display = "inline-block";
+                            topPlatform.parentNode.removeChild(topPlatform);
+                            break;
+                        }
+                }
+                if (document.getElementById("subscribe-manage-top-platform-whole").getElementsByClassName("subscribe-manage-platform-css").length === 0) document.getElementById("subscribe-manage-top-platform-whole").innerHTML += "<div class='subscribe-manage-platform-none-css' th:if='${session.userVo.subscribeVoList.size() == 0}'>暂无订阅</div>";
+            }
+
+            function commitManage() {
+                const topPlatforms = document.getElementById("subscribe-manage-top-platform-whole").getElementsByClassName("subscribe-manage-platform-css"),
+                    bottomPlatforms = document.getElementById("subscribe-manage-bottom-platform-whole").getElementsByClassName("subscribe-manage-platform-css");
+                for (let i = 0; i < topPlatforms.length; i++) {
+                    for (let j = 0; j < bottomPlatforms.length; j++) if (bottomPlatforms[j].style.display === "none") bottomPlatforms[j].style.display = "inline-block";
+                    topPlatforms[i].removeChild(topPlatforms[i].getElementsByClassName("subscribe-manage-top-half-ico-css")[0]);
+                }
+                for (let i = 0; i < bottomPlatforms.length; i++) bottomPlatforms[i].removeChild(bottomPlatforms[i].getElementsByClassName("subscribe-manage-bottom-half-ico-css")[0]);
+                exitManage = function () {
+                    document.getElementById("subscribe-manage").setAttribute("hidden", "hidden");
+                    document.getElementById("subscribe-content").removeAttribute("hidden");
+                }
+                const subscribeList = [],
+                    subscribes = document.getElementById("subscribe-manage-top-platform-whole").getElementsByClassName("subscribe-manage-platform-css");
+                for (let i = 0; i < subscribes.length; i++) subscribeList.push(subscribes[i].getElementsByClassName("float-left")[0].innerText);
+                $.ajax({
+                    url: '/subscribe/updateSubscribes',
+                    type: 'post',
+                    data: {subscribeList: subscribeList},
+                    traditional: true,
+                    success: function (result) {
+                        if (result.indexOf("失败") === -1) {
+                            showMessage(result, "success");
+                            exitManage = function () {
+                                document.getElementById("subscribe-manage").setAttribute("hidden", "hidden");
+                                document.getElementById("subscribe-content").removeAttribute("hidden");
+                                document.getElementsByClassName("nav-big-title-css")[0].click();
+                                exitManage = function () {
+                                    document.getElementById("subscribe-manage").setAttribute("hidden", "hidden");
+                                    document.getElementById("subscribe-content").removeAttribute("hidden");
+                                }
+                            }
+                        } else showMessage(result, "warning");
+                    },
+                    error: function () {
+                        showMessage("订阅更新失败!请联系开发人员!", "danger");
+                    }
+                });
+                document.getElementsByClassName("subscribe-manage-button-css")[1].style.display = "none";
+                document.getElementsByClassName("subscribe-manage-button-css")[0].style.display = "inline-block";
+            }
+
+            function exitManage() {
+                document.getElementById("subscribe-manage").setAttribute("hidden", "hidden");
+                document.getElementById("subscribe-content").removeAttribute("hidden");
+            }
+
+            function addFeedback() {
+                $.ajax({
+                    url: '/feedback/insertFeedback',
+                    type: 'post',
+                    data: {
+                        feedbackTitle: document.getElementById("feedback").getElementsByClassName("feedback-title-css")[0].value,
+                        feedbackContent: document.getElementById("feedback").getElementsByClassName("feedback-content-css")[0].value
+                    },
+                    traditional: true,
+                    success: function (result) {
+                        document.getElementById("feedback").getElementsByClassName("feedback-title-css")[0].value = "";
+                        document.getElementById("feedback").getElementsByClassName("feedback-content-css")[0].value = "";
+                        if (result.indexOf("成功") !== -1) {
+                            showMessage(result, "success");
+                            document.getElementsByClassName("nav-big-title-css")[0].click();
+                        } else if (result.indexOf("输入") !== -1) showMessage(result, "warning");
+                        else showMessage(result, "danger");
+                    },
+                    error: function () {
+                        document.getElementById("feedback").getElementsByClassName("feedback-title-css")[0].value = "";
+                        document.getElementById("feedback").getElementsByClassName("feedback-content-css")[0].value = "";
+                        showMessage("订阅更新失败!请联系开发人员!", "danger");
+                    }
+                });
+            }
+		</script>
+	</head>
+	<body>
+		<div class="container-fluid nav-css">
+			<div class="col-xs-4 col-sm-4 col-md-2 col-lg-1 div-left cursor-default">
+				<form action="/" method="post">
+					<input type="submit" class="nav-big-title-css" value="今日热榜"/>
+				</form>
+			</div>
+			<div class="col-xs-7 col-sm-7 col-md-9 col-lg-10 div-left cursor-default">
+				<a class="title-css" data-toggle="pill" href="#hotList" onclick="showTitleContent(0)">热榜</a>
+				<a class="title-css" data-toggle="pill" href="#subscribe" onclick="showTitleContent(1)" th:if="${session != null && session.userVo != null}">订阅</a>
+				<a class="title-css" data-toggle="pill" href="#feedback" onclick="showTitleContent(2)" th:if="${session != null && session.userVo != null}">反馈</a>
+			</div>
+			<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 div-right cursor-default">
+				<div class="dropdown">
+					<a data-toggle="dropdown" href="#" class="dropdown-a-css">
+						<div th:if="${session == null || session.userVo == null || session.userVo.username == null}">
+							<img th:src="@{/img/other/default_user.jpg}" class="user-img-css" draggable="false"/>
+						</div>
+						<div th:if="${session != null && session.userVo != null && session.userVo.username != null}" th:text="${session.userVo.username.charAt(0)}" class="user-username-css">
+						</div>
+					</a>
+					<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dLabel">
+						<li class="margin-bottom"
+						    th:if="${session == null || session.userVo == null || session.userVo.username == null}">
+							<form th:action="@{/user/login}" method="post">
+								<input type="submit" class="button-css" value="登录"/>
+							</form>
+						</li>
+						<li th:if="${session == null || session.userVo == null || session.userVo.username == null}">
+							<form th:action="@{/user/register}" method="post">
+								<input type="submit" class="button-css" value="注册"/>
+							</form>
+						</li>
+						<li class="margin-bottom"
+						    th:if="${session != null && session.userVo != null && session.userVo.username != null}">
+							<form th:action="@{/user/userMessage}" method="post">
+								<input type="submit" class="button-css" id="username" value="账户信息"/>
+							</form>
+						</li>
+						<li class="margin-bottom"
+						    th:if="${session != null && session.userVo != null && session.userVo.username != null && session.userVo.accountType == '管理员'}">
+							<form th:action="@{/user/manage}" method="post">
+								<input type="hidden" name="id" value="-1"/>
+								<input type="submit" class="button-css" value="后台管理"/>
+							</form>
+						</li>
+						<li th:if="${session != null && session.userVo != null && session.userVo.username != null}">
+							<form th:action="@{/logout}" method="post">
+								<input type="submit" class="button-css" value="退出"/>
+							</form>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div id="hotList" class="container-fluid title-content-css tab-pane fade active in" th:if="${session != null && session.hotListVoList != null}">
+			<div class="hot-list-sub-title-whole-css">
+				<div th:each="hotListVo, hotListVoStat: ${session.hotListVoList}" th:class="${hotListVoStat.index == hotListVoStat.size -1 ? '' : 'float-left'}">
+					<a th:href="'#hot-list-' + ${hotListVo.id}" data-toggle="pill" class="hot-list-sub-title-css" th:utext="'<img src=\'' + @{'/img/ico/' + ${hotListVo.id == 0 ? 'dailyhotlist' : hotListVo.hotListName} + '.ico'} + '\' class=\'sub-title-ico-css\'/>&nbsp;' + ${hotListVo.hotListName}" th:onclick="'showHotListSubTitleContent(' + ${hotListVo.id} + ')'"></a>
+				</div>
+			</div>
+			<div class="hot-list-sub-title-content-whole-css">
+				<div th:each="hotListVo: ${session.hotListVoList}" th:id="'hot-list-' + ${hotListVo.id}" th:class="'hot-list-sub-title-content-css tab-pane fade' + ${hotListVo.id == 0 ? ' active in' : ''}" th:style="'display: ' + ${hotListVo.id == 0 ? 'block' : 'none'} + ';'">
+					<div class="hot-list-content-one" th:each="hotListDataVo, hotListDataVoStat: ${hotListVo.hotListDataVoList}" hidden>
+						<div class="content-css">
+							<div class="col-xs-2 col-sm-1 col-md-1 col-lg-1 div-center cursor-default content-id-css" th:text="${hotListDataVo.hotListDataId}" th:style="${hotListDataVoStat.index < 3 ? 'color: red;' : ''}"></div>
+							<div class="col-xs-6 col-sm-8 col-md-9 col-lg-9 div-left cursor-default">
+								<div class="content-title-css">
+									<a class="content-title-a-css" th:href="${hotListDataVo.hotListDataUrl}" target="_blank" th:text="${hotListDataVo.hotListDataTitle}"></a>
+								</div>
+								<div class="content-sub-title-css" th:text="${hotListDataVo.hotListDataSubTitle}"></div>
+								<div class="content-heat-whole-css">
+									<div class="content-platform-css float-left" th:utext="'<img src=\'' + @{'/img/ico/' + ${hotListDataVo.hotListName} + '.ico'} + '\' class=\'content-platform-ico-css\'/>' + ${hotListDataVo.hotListName}" th:if="${hotListVo.id == 0}"></div>
+									<div class="content-heat-css" th:text="${hotListDataVo.hotListDataHeat}"></div>
+								</div>
+							</div>
+							<div class="col-xs-4 col-sm-3 col-md-2 col-lg-2 div-center cursor-default">
+								<a th:href="@{${hotListDataVo.hotListDataImageUrl.indexOf('\img') >= 0 ? hotListDataVo.hotListDataImageUrl.substring(hotListDataVo.hotListDataImageUrl.indexOf('\img')) : ''}}" target="_blank">
+									<img class="content-img-css" th:src="@{${hotListDataVo.hotListDataImageUrl.indexOf('\img') >= 0 ? hotListDataVo.hotListDataImageUrl.substring(hotListDataVo.hotListDataImageUrl.indexOf('\img')) : ''}}" th:if="${hotListDataVo.hotListDataImageUrl.length() > 0}"/>
+								</a>
+							</div>
+						</div>
+						<div>
+							<hr class="content-hr-css"/>
+						</div>
+					</div>
+				</div>
+			</div>
+			<img class="hot-list-scroll-top-css" th:src="@{/img/other/scroll_top.jpg}" onclick="hotListSubTitleContentScrollTop()" hidden/>
+		</div>
+		<div id="subscribe" class="container-fluid title-content-css tab-pane fade" th:if="${session != null && session.userVo != null}">
+			<div id="subscribe-content">
+				<div class="col-xs-7 col-sm-8 col-md-10 col-lg-10 div-left cursor-default padding-none-css" th:if="${session.userVo.subscribeVoList.size() > 0}">
+					<div class="subscribe-sub-title-whole-css">
+						<div th:each="subscribeVo, subscribeVoStat: ${session.userVo.subscribeVoList}" th:class="${subscribeVo.id == 0 ? 'active ' : ''} + ${subscribeVoStat.index == subscribeVoStat.size -1 ? '' : 'float-left'}">
+							<a th:href="'#subscribe-' + ${subscribeVo.id}" data-toggle="pill" class="subscribe-sub-title-css" th:utext="'<img src=\'' + @{'/img/ico/' + ${subscribeVo.id == 0 ? 'dailyhotlist' : subscribeVo.hotListName} + '.ico'} + '\' class=\'sub-title-ico-css\'/>&nbsp;' + ${subscribeVo.hotListName}" th:onclick="'showSubscribeSubTitleContent(' + ${subscribeVoStat.index} + ')'"></a>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-7 col-sm-8 col-md-10 col-lg-10 div-center cursor-default padding-none-css" th:if="${session.userVo.subscribeVoList.size() == 0}">
+					<div class="subscribe-sub-title-whole-css subscribe-sub-title-none-css">暂无订阅</div>
+				</div>
+				<div class="col-xs-5 col-sm-4 col-md-2 col-lg-2 div-center cursor-default padding-none-css">
+					<div class="manage-subscribe-css" onclick="manageSubscribe()">订阅管理</div>
+				</div>
+				<div class="subscribe-sub-title-content-whole-css">
+					<div th:if="${session.userVo.subscribeVoList.size() > 0}">
+						<div th:each="subscribeVo: ${session.userVo.subscribeVoList}" th:id="'subscribe-' + ${subscribeVo.id}" th:class="'subscribe-sub-title-content-css tab-pane fade' + ${subscribeVo.id == 0 ? ' active in' : ''}" th:style="'display: ' + ${subscribeVo.id == 0 ? 'block' : 'none'} + ';'">
+							<div class="subscribe-content-one" th:each="hotListDataVo, hotListDataVoStat: ${subscribeVo.hotListDataVoList}" hidden>
+								<div class="content-css">
+									<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 div-center cursor-default content-id-css" th:text="${hotListDataVo.hotListDataId}" th:style="${hotListDataVoStat.index < 3 ? 'color: red;' : ''}"></div>
+									<div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 div-left cursor-default">
+										<div class="content-title-css">
+											<a class="content-title-a-css" th:href="${hotListDataVo.hotListDataUrl}" target="_blank" th:text="${hotListDataVo.hotListDataTitle}"></a>
+										</div>
+										<div class="content-sub-title-css" th:text="${hotListDataVo.hotListDataSubTitle}"></div>
+										<div class="content-heat-whole-css">
+											<div class="content-platform-css float-left" th:utext="'<img src=\'' + @{'/img/ico/' + ${hotListDataVo.hotListName} + '.ico'} + '\' class=\'content-platform-ico-css\'/>&nbsp;' + ${hotListDataVo.hotListName}" th:if="${subscribeVo.id == 0}"></div>
+											<div class="content-heat-css" th:text="${hotListDataVo.hotListDataHeat}"></div>
+										</div>
+									</div>
+									<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 div-center cursor-default">
+										<a th:href="@{${hotListDataVo.hotListDataImageUrl.indexOf('\img') >= 0 ? hotListDataVo.hotListDataImageUrl.substring(hotListDataVo.hotListDataImageUrl.indexOf('\img')) : ''}}" target="_blank">
+											<img class="content-img-css" th:src="@{${hotListDataVo.hotListDataImageUrl.indexOf('\img') >= 0 ? hotListDataVo.hotListDataImageUrl.substring(hotListDataVo.hotListDataImageUrl.indexOf('\img')) : ''}}" th:if="${hotListDataVo.hotListDataImageUrl.length() > 0}"/>
+										</a>
+									</div>
+								</div>
+								<div>
+									<hr class="content-hr-css"/>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="subscribe-content-none-css" th:if="${session.userVo.subscribeVoList.size() == 0}">暂无内容</div>
+				</div>
+				<img class="subscribe-scroll-top-css" th:src="@{/img/other/scroll_top.jpg}" onclick="subscribeSubTitleContentScrollTop()" hidden/>
+			</div>
+			<div id="subscribe-manage" hidden>
+				<div class="subscribe-manage-top-half-css">
+					<div class="col-xs-6 col-sm-5 col-md-2 col-lg-2 div-left cursor-default padding-none-css col-background-css">
+						<div class="subscribe-manage-title-css">我的订阅</div>
+					</div>
+					<div class="col-xs-6 col-sm-7 col-md-10 col-lg-10 div-right cursor-default padding-none-css col-background-css">
+						<div class="subscribe-manage-button-css" onclick="manage()">管理</div>
+						<div class="subscribe-manage-button-css display-none-css" onclick="commitManage()">完成</div>
+						<div class="subscribe-manage-button-css" onclick="exitManage()">退出管理</div>
+					</div>
+					<div id="subscribe-manage-top-platform-whole">
+						<div th:if="${session.userVo.subscribeVoList.size() > 0}">
+							<div th:each="subscribeVo, subscribeVoStat: ${session.userVo.subscribeVoList}" th:id="'subscribe-manage-top-platform-' + ${subscribeVo.id}" class="subscribe-manage-platform-css float-left" th:onclick="'removeSubscribe(\'subscribe-manage-top-platform-' + ${subscribeVo.id} + '\')'" th:if="${subscribeVo.id > 0}">
+								<div class="float-left" th:text="${subscribeVo.hotListName}"></div>
+							</div>
+						</div>
+						<div class="subscribe-manage-platform-none-css" th:if="${session.userVo.subscribeVoList.size() == 0}">暂无订阅</div>
+					</div>
+				</div>
+				<div class="subscribe-manage-bottom-half-css">
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 div-left cursor-default padding-none-css col-background-css">
+						<div class="subscribe-manage-title-css">全部订阅</div>
+					</div>
+					<div id="subscribe-manage-bottom-platform-whole" th:if="${session.hotListVoList.size() > 0}">
+						<div th:each="hotListVo, hotListVoStat : ${session.hotListVoList}" th:id="'subscribe-manage-bottom-platform-' + ${hotListVo.id}" class="subscribe-manage-platform-css float-left" th:onclick="'addSubscribe(\'subscribe-manage-bottom-platform-' + ${hotListVo.id} + '\')'" th:if="${hotListVo.id > 0}">
+							<div class="float-left" th:text="${hotListVo.hotListName}"></div>
+						</div>
+					</div>
+					<div class="subscribe-manage-platform-none-css" th:if="${session.hotListVoList.size() == 0}">暂无更多</div>
+				</div>
+			</div>
+		</div>
+		<div id="feedback" class="container-fluid title-content-css tab-pane fade" th:if="${session != null && session.userVo != null}">
+			<div class="col-xs-6 col-sm-5 col-md-2 col-lg-2 div-left cursor-default padding-none-css col-background-css feedback-top-left-border-radius">
+				<div class="feedback-top-left-css">反馈信息</div>
+			</div>
+			<div class="col-xs-6 col-sm-7 col-md-10 col-lg-10 div-right cursor-default padding-none-css col-background-css feedback-top-right-border-radius">
+				<form th:action="@{/user/userMessage}" method="post">
+					<input type="submit" value="我的反馈" class="feedback-top-right-css"/>
+				</form>
+			</div>
+			<div class="col-xs-4 col-sm-3 col-md-2 col-lg-2 div-left cursor-default feedback-margin-top-css feedback-title-font-css feedback-title-height-css">标题：</div>
+			<div class="col-xs-8 col-sm-9 col-md-10 col-lg-10 div-right cursor-default feedback-margin-top-css feedback-font-css feedback-title-height-css">
+				<input type="text" class="feedback-title-css" placeholder="请输入标题"/>
+			</div>
+			<div class="col-xs-4 col-sm-3 col-md-2 col-lg-2 div-left cursor-default feedback-margin-top-css feedback-content-font-css feedback-content-height-css">内容：</div>
+			<div class="col-xs-8 col-sm-9 col-md-10 col-lg-10 div-right cursor-default feedback-margin-top-css feedback-font-css feedback-content-height-css">
+				<textarea class="feedback-content-css" placeholder="请输入内容"></textarea>
+			</div>
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 div-center cursor-default">
+				<div class="feedback-button-css" onclick="addFeedback()">提交</div>
+			</div>
+		</div>
+		<div class="container-fluid bottom-css">
+			<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 div-left cursor-default">
+				其实地上本没有路，走的人多了，也便成了路。
+			</div>
+			<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 div-right cursor-default">
+				——— 鲁迅 •《故乡》
+			</div>
+		</div>
+	</body>
+</html>

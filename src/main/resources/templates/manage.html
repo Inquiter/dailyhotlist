@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<title>后台管理</title>
+		<meta charset="UTF-8"/>
+		<link rel="icon" type="image/x-icon" th:href="@{/img/ico/dailyhotlist.ico}"/>
+		<script type="text/javascript" th:src="@{/js/jquery-3.7.0.min.js}"></script>
+		<script type="text/javascript" th:src="@{/bootstrap-3.3.7-dist/js/bootstrap.min.js}"></script>
+		<link rel="stylesheet" th:href="@{/bootstrap-3.3.7-dist/css/bootstrap.min.css}"/>
+		<link rel="stylesheet" th:href="@{/css/manage.css}"/>
+		<script th:inline="javascript">
+            document.onreadystatechange = function () {
+                if (document.readyState === "complete") document.body.style.display = "block";
+                else document.body.style.display = "none";
+            };
+
+            window.onload = function () {
+                const feedbackMsg = '[[${feedbackMsg}]]'.replaceAll("\"", "");
+                if (feedbackMsg !== 'null')
+                    if (feedbackMsg.indexOf("成功") !== -1) showMessage(feedbackMsg, 'success');
+                    else if (feedbackMsg.indexOf("未登录") !== -1 || feedbackMsg.indexOf("开发人员") !== -1) showMessage(feedbackMsg, 'danger');
+                    else showMessage(feedbackMsg, 'warning');
+                document.getElementsByClassName("manage-right-css")[0].onscroll = function () {
+                    const scrollTop = document.getElementsByClassName("scroll-top-css")[0];
+                    if (this.scrollTop > 500) scrollTop.removeAttribute("hidden");
+                    else scrollTop.setAttribute("hidden", "hidden");
+                    const contents = document.getElementsByClassName("manage-content-whole-css");
+                    for (let i = 0; i < contents.length; i++) if (contents[i].style.display === "block") {
+                        lazyLoad(this, contents[i].getElementsByClassName("manage-content-css"), contents[i].getElementsByClassName("manage-search-input-css")[0].value.trim());
+                        break;
+                    }
+                };
+                const manageButtons = document.getElementsByClassName("manage-button-whole-css");
+                for (let i = 0; i < manageButtons.length; i++) manageButtons[i].onwheel = function (event) {
+                    this.scrollLeft += event.deltaY < 0 ? -100 : 100;
+                };
+                const id = '[[${id}]]'.replaceAll("\"", "");
+                if (id !== 'null' && parseInt(id) >= 0 && parseInt(id) < document.getElementsByClassName("manage-title-css").length) {
+                    if (parseInt(id) > 0 && parseInt(id) < 3) showOrHiddenTitle();
+                    document.getElementsByClassName("manage-title-css")[id].click();
+                }
+            }
+
+            function showMessage(msg, type) {
+                const divElement = $("<div></div>").addClass('alert').addClass('alert-' + type).addClass('alert-dismissible').addClass('col-md-4');
+                divElement.css({
+                    "position": "absolute",
+                    "top": "5vh",
+                    "height": "6vh",
+                    "padding-top": "1.5vh",
+                    "border": "none",
+                    "text-align": "center",
+                    "background-color": type === "success" ? "rgb(218, 255, 206)" : type === "warning" ? "rgb(255, 252, 192)" : type === "danger" ? "rgb(255,183,183)" : "rgb(255, 255, 255)",
+                    "font-size": "2vh",
+                    "font-family": "Microsoft YaHei",
+                    "margin-left": "36vw",
+                });
+                divElement.text(msg);
+                $('body').append(divElement);
+                let isIn = false;
+                divElement.on({
+                    mouseover: function () {
+                        isIn = true;
+                    },
+                    mouseout: function () {
+                        isIn = false;
+                    }
+                });
+                setTimeout(function () {
+                    const IntervalMS = 30; //每次上浮的间隔毫秒
+                    const floatSpace = document.body.clientHeight * 0.03; //上浮的空间(vh)
+                    let nowTop = divElement.offset().top;   //获取元素当前的top值
+                    const stopTop = nowTop - floatSpace;    //上浮停止时的top值
+                    divElement.fadeOut(IntervalMS * floatSpace); //设置元素淡出
+                    let upFloat = setInterval(function () { //开始上浮
+                        if (nowTop >= stopTop) { //判断当前消息框top是否还在可上升的范围内
+                            divElement.css({"top": nowTop--}); //消息框的top上升1px
+                        } else {
+                            clearInterval(upFloat); //关闭上浮
+                            divElement.remove();    //移除元素
+                        }
+                    }, IntervalMS);
+                    if (isIn) { //如果鼠标在setTimeout之前已经放在的消息框中，则停止上浮
+                        clearInterval(upFloat);
+                        divElement.stop();
+                    }
+                    divElement.hover(function () { //鼠标悬浮时停止上浮和淡出效果，过后恢复
+                        clearInterval(upFloat);
+                        divElement.stop();
+                    }, function () {
+                        divElement.fadeOut(IntervalMS * (nowTop - stopTop)); // 这里设置元素淡出的时间应该为：间隔毫秒*剩余可以上浮空间
+                        upFloat = setInterval(function () { // 继续上浮
+                            if (nowTop >= stopTop) {
+                                divElement.css({"top": nowTop--});
+                            } else {
+                                clearInterval(upFloat); // 关闭上浮
+                                divElement.remove();    // 移除元素
+                            }
+                        }, IntervalMS);
+                    });
+                }, 2000);
+            }
+
+            function manage(number) {
+                document.getElementsByClassName("manage-right-css")[0].scrollLeft = 0;
+                const titles = document.getElementsByClassName("manage-title-css"),
+                    contents = document.getElementsByClassName("manage-content-whole-css");
+                for (let i = 0; i < titles.length; i++)
+                    if (i === parseInt(number)) {
+                        titles[i].classList.add("active");
+                        contents[i].style.display = "block";
+                    } else {
+                        titles[i].classList.remove("active");
+                        contents[i].style.display = "none";
+                    }
+                lazyLoad(document.getElementsByClassName("manage-right-css")[0], contents[number].getElementsByClassName("manage-content-css"), contents[number].getElementsByClassName("manage-search-input-css")[0].value.trim());
+                document.getElementsByClassName("manage-left-id")[0].value = number;
+            }
+
+            function lazyLoad(manageRight, contents, str) {
+                if (str !== "") {
+                    const contentList = [];
+                    for (let i = 0, content; i < contents.length; i++) {
+                        content = contents[i].getElementsByClassName("manage-content-font-css");
+                        for (let j = 0; j < content.length; j++) if (content[j].innerText === str) {
+                            contentList.push(contents[i]);
+                            break;
+                        }
+                    }
+                    contents = contentList;
+                }
+                if (manageRight.scrollTop + manageRight.clientHeight >= manageRight.scrollHeight) {
+                    let index = 0;
+                    while (index < contents.length) if (contents[index].getAttribute("hidden") === "hidden") break; else index++;
+                    if (index < contents.length) for (let i = index; i < index + 15 && i < contents.length; i++) contents[i].removeAttribute("hidden");
+                }
+            }
+
+            function showOrHiddenTitle() {
+                const dropdown = document.getElementsByClassName("manage-title-hotlist-css")[0].getElementsByTagName("span")[0];
+                dropdown.innerText === "▾" ? dropdown.innerText = "▴" : dropdown.innerText = "▾";
+                const titles = document.getElementsByClassName("manage-title-margin-top")[1].getElementsByClassName("div-center");
+                for (let i = 0; i < titles.length; i++) titles[i].style.display = (titles[i].style.display === "none" ? "block" : "none");
+                const hr = document.getElementsByClassName("manage-title-margin-top")[1].getElementsByClassName("hr-css")[0];
+                hr.style.display = (hr.style.display === "none" ? "block" : "none");
+            }
+
+            function manageScrollTop() {
+                document.getElementsByClassName("manage-right-css")[0].scrollTop = 0;
+            }
+
+            function search(number) {
+                const str = document.getElementsByClassName("manage-content-whole-css")[number].getElementsByClassName("manage-search-input-css")[0].value.trim(),
+                    contents = document.getElementsByClassName("manage-content-whole-css")[number].getElementsByClassName("manage-content-css");
+                if (str === "") for (let i = 0; i < contents.length; i++) if (i < 15 && i < contents.length) contents[i].removeAttribute("hidden"); else contents[i].setAttribute("hidden", "hidden");
+                else for (let i = 0, content, f; i < contents.length; i++) {
+                    content = contents[i].getElementsByClassName("manage-content-font-css");
+                    f = true;
+                    for (let j = 0; j < content.length && f; j++) if (i < 15 && content[j].innerText.indexOf(str) !== -1) {
+                        contents[i].removeAttribute("hidden");
+                        f = false;
+                    }
+                    if (f) contents[i].setAttribute("hidden", "hidden");
+                }
+            }
+
+            function addUser() {
+                const user = document.getElementById("user-add");
+                $.ajax({
+                    url: '/user/addUser',
+                    type: 'post',
+                    data: {
+                        username: user.getElementsByClassName("modal-content-css")[0].value,
+                        password: user.getElementsByClassName("modal-content-css")[1].value,
+                        accountType: user.getElementsByClassName("modal-select-css")[0].value
+                    },
+                    traditional: true,
+                    success: function (result) {
+                        if (result.indexOf("成功") !== -1) {
+                            user.getElementsByClassName("close")[0].click();
+                            showMessage(result, "success");
+                            setTimeout(() => {
+                                document.getElementsByClassName("manage-left-top-css")[0].click();
+                            }, 2000);
+                        } else alert(result);
+                    },
+                    error: function () {
+                        user.getElementsByClassName("close")[0].click();
+                        showMessage("添加失败!请联系开发人员!", "danger");
+                    }
+                });
+            }
+
+            function updateUser(number) {
+                const user = document.getElementById("user-update-" + number);
+                $.ajax({
+                    url: '/user/updateUser',
+                    type: 'post',
+                    data: {
+                        id: user.getElementsByClassName("modal-content-css")[0].innerText,
+                        username: user.getElementsByClassName("modal-content-css")[1].value,
+                        password: user.getElementsByClassName("modal-content-css")[2].value,
+                        accountType: user.getElementsByClassName("modal-select-css")[0].value
+                    },
+                    traditional: true,
+                    success: function (result) {
+                        if (result.indexOf("成功") !== -1) {
+                            user.getElementsByClassName("close")[0].click();
+                            showMessage(result, "success");
+                            setTimeout(() => {
+                                document.getElementsByClassName("manage-left-top-css")[0].click();
+                            }, 2000);
+                        } else alert(result);
+                    },
+                    error: function () {
+                        user.getElementsByClassName("close")[0].click();
+                        showMessage("修改失败!请联系开发人员!", "danger");
+                    }
+                });
+            }
+
+            function deleteUser(number) {
+                if (confirm("确定要删除该用户吗？")) {
+                    const user = document.getElementById("user-detail-" + number);
+                    $.ajax({
+                        url: '/user/deleteUser',
+                        type: 'post',
+                        data: {id: user.getElementsByClassName("modal-content-css")[0].innerText},
+                        traditional: true,
+                        success: function (result) {
+                            if (result.indexOf("成功") !== -1) {
+                                showMessage(result, "success");
+                                setTimeout(() => {
+                                    document.getElementsByClassName("manage-left-top-css")[0].click();
+                                }, 2000);
+                            } else alert(result);
+                        },
+                        error: function () {
+                            user.getElementsByClassName("close")[0].click();
+                            showMessage("删除失败!请联系开发人员!", "danger");
+                        }
+                    });
+                }
+            }
+
+            function addHotList() {
+                const hotList = document.getElementById("hotlist-add");
+                $.ajax({
+                    url: '/hotList/addHotList',
+                    type: 'post',
+                    data: {
+                        hotListName: hotList.getElementsByClassName("modal-content-css")[0].value,
+                        hotListUrl: hotList.getElementsByClassName("modal-content-css")[1].value
+                    },
+                    traditional: true,
+                    success: function (result) {
+                        if (result.indexOf("成功") !== -1) {
+                            hotList.getElementsByClassName("close")[0].click();
+                            showMessage(result, "success");
+                            setTimeout(() => {
+                                document.getElementsByClassName("manage-left-top-css")[0].click();
+                            }, 2000);
+                        } else alert(result);
+                    },
+                    error: function () {
+                        hotList.getElementsByClassName("close")[0].click();
+                        showMessage("添加失败!请联系开发人员!", "danger");
+                    }
+                });
+            }
+
+            function updateHotList(number) {
+                const hotList = document.getElementById("hotlist-update-" + number);
+                $.ajax({
+                    url: '/hotList/updateHotList',
+                    type: 'post',
+                    data: {
+                        id: hotList.getElementsByClassName("modal-content-css")[0].innerText,
+                        hotListName: hotList.getElementsByClassName("modal-content-css")[1].value,
+                        hotListUrl: hotList.getElementsByClassName("modal-content-css")[2].value,
+                    },
+                    traditional: true,
+                    success: function (result) {
+                        if (result.indexOf("成功") !== -1) {
+                            hotList.getElementsByClassName("close")[0].click();
+                            showMessage(result, "success");
+                            setTimeout(() => {
+                                document.getElementsByClassName("manage-left-top-css")[0].click();
+                            }, 2000);
+                        } else alert(result);
+                    },
+                    error: function () {
+                        hotList.getElementsByClassName("close")[0].click();
+                        showMessage("修改失败!请联系开发人员!", "danger");
+                    }
+                });
+            }
+
+            function deleteHotList(number) {
+                if (confirm("确定要删除该平台数据吗？")) {
+                    const hotList = document.getElementById("hotlist-detail-" + number);
+                    $.ajax({
+                        url: '/hotList/deleteHotList',
+                        type: 'post',
+                        data: {id: hotList.getElementsByClassName("modal-content-css")[0].innerText},
+                        traditional: true,
+                        success: function (result) {
+                            if (result.indexOf("成功") !== -1) {
+                                showMessage(result, "success");
+                                setTimeout(() => {
+                                    document.getElementsByClassName("manage-left-top-css")[0].click();
+                                }, 2000);
+                            } else alert(result);
+                        },
+                        error: function () {
+                            hotList.getElementsByClassName("close")[0].click();
+                            showMessage("删除失败!请联系开发人员!", "danger");
+                        }
+                    });
+                }
+            }
+
+            function addHotListData() {
+                const hotListData = document.getElementById("hotlist-data-add");
+                $.ajax({
+                    url: '/hotListData/addHotListData',
+                    type: 'post',
+                    data: {
+                        hotListDataId: hotListData.getElementsByClassName("modal-content-css")[0].value,
+                        hotListDataUrl: hotListData.getElementsByClassName("modal-content-css")[1].value,
+                        hotListDataTitle: hotListData.getElementsByClassName("modal-content-css")[2].value,
+                        hotListDataSubTitle: hotListData.getElementsByClassName("modal-content-css")[3].value,
+                        hotListDataHeat: hotListData.getElementsByClassName("modal-content-css")[4].value,
+                        hotListDataImageUrl: hotListData.getElementsByClassName("modal-content-css")[5].value,
+                        hotListName: hotListData.getElementsByClassName("modal-select-css")[0].value
+                    },
+                    traditional: true,
+                    success: function (result) {
+                        if (result.indexOf("成功") !== -1) {
+                            hotListData.getElementsByClassName("close")[0].click();
+                            showMessage(result, "success");
+                            setTimeout(() => {
+                                document.getElementsByClassName("manage-left-top-css")[0].click();
+                            }, 2000);
+                        } else alert(result);
+                    },
+                    error: function () {
+                        hotListData.getElementsByClassName("close")[0].click();
+                        showMessage("添加失败!请联系开发人员!", "danger");
+                    }
+                });
+            }
+
+            function updateHotListData(number) {
+                const hotListData = document.getElementById("hotlist-data-update-" + number);
+                $.ajax({
+                    url: '/hotListData/updateHotListData',
+                    type: 'post',
+                    data: {
+                        id: hotListData.getElementsByClassName("modal-content-css")[0].innerText,
+                        hotListDataId: hotListData.getElementsByClassName("modal-content-css")[1].value,
+                        hotListDataUrl: hotListData.getElementsByClassName("modal-content-css")[2].value,
+                        hotListDataTitle: hotListData.getElementsByClassName("modal-content-css")[3].value,
+                        hotListDataSubTitle: hotListData.getElementsByClassName("modal-content-css")[4].value,
+                        hotListDataHeat: hotListData.getElementsByClassName("modal-content-css")[5].value,
+                        hotListDataImageUrl: hotListData.getElementsByClassName("modal-content-css")[6].value,
+                        hotListName: hotListData.getElementsByClassName("modal-select-css")[0].value
+                    }, traditional: true,
+                    success: function (result) {
+                        if (result.indexOf("成功") !== -1) {
+                            hotListData.getElementsByClassName("close")[0].click();
+                            showMessage(result, "success");
+                            setTimeout(() => {
+                                document.getElementsByClassName("manage-left-top-css")[0].click();
+                            }, 2000);
+                        } else alert(result);
+                    },
+                    error: function () {
+                        hotListData.getElementsByClassName("close")[0].click();
+                        showMessage("修改失败!请联系开发人员!", "danger");
+                    }
+                });
+            }
+
+            function deleteHotListData(number) {
+                if (confirm("确定要删除该热点数据吗？")) {
+                    const hotListData = document.getElementById("hotlist-data-detail-" + number);
+                    $.ajax({
+                        url: '/hotListData/deleteHotListData',
+                        type: 'post',
+                        data: {id: hotListData.getElementsByClassName("modal-content-css")[0].innerText},
+                        traditional: true,
+                        success: function (result) {
+                            if (result.indexOf("成功") !== -1) {
+                                showMessage(result, "success");
+                                setTimeout(() => {
+                                    document.getElementsByClassName("manage-left-top-css")[0].click();
+                                }, 2000);
+                            } else alert(result);
+                        },
+                        error: function () {
+                            hotListData.getElementsByClassName("close")[0].click();
+                            showMessage("删除失败!请联系开发人员!", "danger");
+                        }
+                    });
+                }
+            }
+
+            function addSubscribe() {
+                const subscribe = document.getElementById("subscribe-add");
+                $.ajax({
+                    url: '/subscribe/addSubscribe',
+                    type: 'post',
+                    data: {
+                        hotListName: subscribe.getElementsByClassName("modal-content-css")[0].value,
+                        userId: subscribe.getElementsByClassName("modal-select-css")[1].value
+                    },
+                    traditional: true,
+                    success: function (result) {
+                        if (result.indexOf("成功") !== -1) {
+                            subscribe.getElementsByClassName("close")[0].click();
+                            showMessage(result, "success");
+                            setTimeout(() => {
+                                document.getElementsByClassName("manage-left-top-css")[0].click();
+                            }, 2000);
+                        } else alert(result);
+                    },
+                    error: function () {
+                        subscribe.getElementsByClassName("close")[0].click();
+                        showMessage("添加失败!请联系开发人员!", "danger");
+                    }
+                });
+            }
+
+            function updateSubscribe(number) {
+                const subscribe = document.getElementById("subscribe-update-" + number);
+                $.ajax({
+                    url: '/subscribe/updateSubscribe',
+                    type: 'post',
+                    data: {
+                        id: subscribe.getElementsByClassName("modal-content-css")[0].innerText,
+                        hotListName: subscribe.getElementsByClassName("modal-select-css")[0].value,
+                        userId: subscribe.getElementsByClassName("modal-select-css")[1].value
+                    }, traditional: true,
+                    success: function (result) {
+                        if (result.indexOf("成功") !== -1) {
+                            subscribe.getElementsByClassName("close")[0].click();
+                            showMessage(result, "success");
+                            setTimeout(() => {
+                                document.getElementsByClassName("manage-left-top-css")[0].click();
+                            }, 2000);
+                        } else alert(result);
+                    },
+                    error: function () {
+                        subscribe.getElementsByClassName("close")[0].click();
+                        showMessage("修改失败!请联系开发人员!", "danger");
+                    }
+                });
+            }
+
+            function deleteSubscribe(number) {
+                if (confirm("确定要删除该订阅吗？")) {
+                    const subscribe = document.getElementById("subscribe-detail-" + number);
+                    $.ajax({
+                        url: '/subscribe/deleteSubscribe',
+                        type: 'post',
+                        data: {id: subscribe.getElementsByClassName("modal-content-css")[0].innerText},
+                        traditional: true,
+                        success: function (result) {
+                            if (result.indexOf("成功") !== -1) {
+                                showMessage(result, "success");
+                                setTimeout(() => {
+                                    document.getElementsByClassName("manage-left-top-css")[0].click();
+                                }, 2000);
+                            } else alert(result);
+                        },
+                        error: function () {
+                            subscribe.getElementsByClassName("close")[0].click();
+                            showMessage("删除失败!请联系开发人员!", "danger");
+                        }
+                    });
+                }
+            }
+
+            function addFeedback() {
+                const feedback = document.getElementById("feedback-add");
+                $.ajax({
+                    url: '/feedback/addFeedback',
+                    type: 'post',
+                    data: {
+                        feedbackTitle: feedback.getElementsByClassName("modal-content-css")[0].value,
+                        feedbackContent: feedback.getElementsByClassName("modal-content-css")[1].value,
+                        userId: feedback.getElementsByClassName("modal-select-css")[0].value
+                    },
+                    traditional: true,
+                    success: function (result) {
+                        if (result.indexOf("成功") !== -1) {
+                            feedback.getElementsByClassName("close")[0].click();
+                            showMessage(result, "success");
+                            setTimeout(() => {
+                                document.getElementsByClassName("manage-left-top-css")[0].click();
+                            }, 2000);
+                        } else alert(result);
+                    },
+                    error: function () {
+                        feedback.getElementsByClassName("close")[0].click();
+                        showMessage("添加失败!请联系开发人员!", "danger");
+                    }
+                });
+            }
+
+            function updateFeedback(number) {
+                const feedback = document.getElementById("feedback-update-" + number);
+                $.ajax({
+                    url: '/feedback/updateFeedback',
+                    type: 'post',
+                    data: {
+                        id: feedback.getElementsByClassName("modal-content-css")[0].innerText,
+                        feedbackTitle: feedback.getElementsByClassName("modal-content-css")[1].value,
+                        feedbackContent: feedback.getElementsByClassName("modal-content-css")[2].value,
+                        userId: feedback.getElementsByClassName("modal-select-css")[0].value
+                    }, traditional: true,
+                    success: function (result) {
+                        if (result.indexOf("成功") !== -1) {
+                            feedback.getElementsByClassName("close")[0].click();
+                            showMessage(result, "success");
+                            setTimeout(() => {
+                                document.getElementsByClassName("manage-left-top-css")[0].click();
+                            }, 2000);
+                        } else alert(result);
+                    },
+                    error: function () {
+                        feedback.getElementsByClassName("close")[0].click();
+                        showMessage("修改失败!请联系开发人员!", "danger");
+                    }
+                });
+            }
+
+            function deleteFeedback(number) {
+                if (confirm("确定要删除该反馈吗？")) {
+                    const feedback = document.getElementById("feedback-detail-" + number);
+                    $.ajax({
+                        url: '/feedback/deleteFeedback',
+                        type: 'post',
+                        data: {id: feedback.getElementsByClassName("modal-content-css")[0].innerText},
+                        traditional: true,
+                        success: function (result) {
+                            if (result.indexOf("成功") !== -1) {
+                                showMessage(result, "success");
+                                setTimeout(() => {
+                                    document.getElementsByClassName("manage-left-top-css")[0].click();
+                                }, 2000);
+                            } else alert(result);
+                        },
+                        error: function () {
+                            feedback.getElementsByClassName("close")[0].click();
+                            showMessage("删除失败!请联系开发人员!", "danger");
+                        }
+                    });
+                }
+            }
+		</script>
+	</head>
+	<body>
+		<div class="container-fluid nav-css">
+			<div class="col-xs-4 col-sm-4 col-md-2 col-lg-1 div-left cursor-default">
+				<form action="/" method="post">
+					<input type="submit" class="nav-big-title-css" value="今日热榜"/>
+				</form>
+			</div>
+			<div class="col-xs-7 col-sm-7 col-md-9 col-lg-10 div-left cursor-default"></div>
+			<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 div-right cursor-default">
+				<div class="dropdown">
+					<a data-toggle="dropdown" href="#" class="dropdown-a-css">
+						<div th:if="${session == null || session.userVo == null || session.userVo.username == null}">
+							<img th:src="@{/img/other/default_user.jpg}" class="user-img-css" draggable="false"/>
+						</div>
+						<div th:if="${session != null && session.userVo != null && session.userVo.username != null}" th:text="${session.userVo.username.charAt(0)}" class="user-username-css"></div>
+					</a>
+					<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dLabel">
+						<li class="margin-bottom" th:if="${session == null || session.userVo == null || session.userVo.username == null}">
+							<form th:action="@{/user/login}" method="post">
+								<input type="submit" class="button-css" value="登录"/>
+							</form>
+						</li>
+						<li th:if="${session == null || session.userVo == null || session.userVo.username == null}">
+							<form th:action="@{/user/register}" method="post">
+								<input type="submit" class="button-css" value="注册"/>
+							</form>
+						</li>
+						<li class="margin-bottom" th:if="${session != null && session.userVo != null && session.userVo.username != null}">
+							<form th:action="@{/user/userMessage}" method="post">
+								<input type="submit" class="button-css" id="username" value="账户信息"/>
+							</form>
+						</li>
+						<li class="margin-bottom" th:if="${session != null && session.userVo != null && session.userVo.username != null && session.userVo.accountType == '管理员'}">
+							<form th:action="@{/user/manage}" method="post">
+								<input type="hidden" name="id" value="-1"/>
+								<input type="submit" class="button-css" value="后台管理"/>
+							</form>
+						</li>
+						<li th:if="${session != null && session.userVo != null && session.userVo.username != null}">
+							<form th:action="@{/logout}" method="post">
+								<input type="submit" class="button-css" value="退出"/>
+							</form>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-4 col-sm-4 col-md-2 col-lg-2 div-left cursor-default padding-none-css manage-left-css">
+			<div class="div-center">
+				<form th:action="@{/user/manage}" method="post">
+					<input type="hidden" class="manage-left-id" name="id" value="-1"/>
+					<input type="submit" class="manage-left-top-css" value="后台管理"/>
+				</form>
+			</div>
+			<div class="manage-title-margin-top"><a class="manage-title-css" data-toggle="pill" href="#user" onclick="manage(0)">用户管理</a></div>
+			<div class="manage-title-margin-top">
+				<div class="manage-title-hotlist-css" onclick="showOrHiddenTitle()">热点管理&nbsp;<span>▾</span></div>
+				<div class="div-center manage-title-margin-top" style="display: none;">
+					<a class="manage-title-css" data-toggle="pill" href="#hotlist-platform" onclick="manage(1)">热点平台管理</a>
+				</div>
+				<hr class="hr-css" style="display: none;"/>
+				<div class="div-center" style="display: none;">
+					<a class="manage-title-css" data-toggle="pill" href="#hotlist-content" onclick="manage(2)">热点信息管理</a>
+				</div>
+			</div>
+			<div class="manage-title-margin-top"><a class="manage-title-css" data-toggle="pill" href="#subscribe" onclick="manage(3)">订阅管理</a></div>
+			<div class="manage-title-margin-top"><a class="manage-title-css" data-toggle="pill" href="#feedback" onclick="manage(4)">反馈管理</a></div>
+		</div>
+		<div class="col-xs-8 col-sm-8 col-md-10 col-lg-10 div-center cursor-default padding-none-css manage-right-css">
+			<div class="manage-content-whole-css tab-pane fade active in" id="user">
+				<div id="user-content" th:if="${session.userList != null && session.userList.size() > 0}">
+					<div>
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 div-left cursor-default padding-none-css">
+							<div class="manage-search-css">
+								<input type="text" class="manage-search-input-css" placeholder="请输入检索关键字..."/>
+								<i class="glyphicon glyphicon-search" onclick="search(0)"></i>
+							</div>
+							<div class="manage-add-css" data-toggle="modal" data-target="#user-add">添加用户</div>
+						</div>
+						<div class="modal fade" id="user-add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+							<div class="modal-dialog modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+									<div class="modal-title modal-title-css">添加用户</div>
+								</div>
+								<div class="modal-body div-left">
+									<div class="modal-content-font-css modal-margin-bottom">
+										用户名：
+										<input type="text" class="modal-content-css modal-input-css"/>
+									</div>
+									<div class="modal-content-font-css modal-margin-bottom">
+										密码：　
+										<input type="password" class="modal-content-css modal-input-css"/>
+									</div>
+									<div class="modal-content-font-css">
+										账号类型：
+										<select class="modal-select-css">
+											<option class="modal-content-css" selected>普通用户</option>
+											<option class="modal-content-css">管理员</option>
+										</select>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-primary modal-button-css" onclick="addUser()">添加</button>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-2 col-sm-2 col-md-1 col-lg-1 div-center cursor-default manage-content-font-css border-top-left-css">序号</div>
+						<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 div-center cursor-default manage-content-font-css">用户名</div>
+						<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 div-center cursor-default manage-content-font-css">密码</div>
+						<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 div-center cursor-default manage-content-font-css">账户类型</div>
+						<div class="col-xs-2 col-sm-2 col-md-3 col-lg-3 div-center cursor-default manage-content-font-css border-top-right-css">操作</div>
+					</div>
+					<div class="manage-content-css" th:each="user, userStat : ${session.userList}" hidden="hidden">
+						<div th:class="'col-xs-2 col-sm-2 col-md-1 col-lg-1 div-center cursor-default manage-content-font-css' + ${userStat.index == userStat.size - 1 ? ' border-bottom-left-css' : ''}" th:text="${userStat.index + 1}"></div>
+						<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 div-center cursor-default manage-content-font-css" th:text="${user.username}"></div>
+						<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 div-center cursor-default manage-content-font-css" th:text="${user.password}"></div>
+						<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 div-center cursor-default manage-content-font-css" th:text="${user.accountType}"></div>
+						<div th:class="'col-xs-2 col-sm-2 col-md-3 col-lg-3 div-center cursor-default manage-button-whole-css' + ${userStat.index == userStat.size - 1 ? ' border-bottom-right-css' : ''}">
+							<div class="manage-button-css" data-toggle="modal" th:data-target="'#user-detail-' + ${userStat.index}">详细</div>
+							<div class="modal fade" th:id="'user-detail-' + ${userStat.index}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+								<div class="modal-dialog modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+										<div class="modal-title modal-title-css">详细内容</div>
+									</div>
+									<div class="modal-body div-left">
+										<div class="modal-content-font-css modal-margin-bottom">
+											用户ID：
+											<div class="modal-content-css" style="user-select: text;" th:text="${user.id}"></div>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											用户名：
+											<div class="modal-content-css" style="user-select: text;" th:text="${user.username}"></div>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											密码：
+											<div class="modal-content-css" style="user-select: text;" th:text="${user.password}"></div>
+										</div>
+										<div class="modal-content-font-css">
+											账号类型：
+											<div class="modal-content-css" style="user-select: text;" th:text="${user.accountType}"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="manage-button-css" data-toggle="modal" th:data-target="'#user-update-' + ${userStat.index}">修改</div>
+							<div class="modal fade" th:id="'user-update-' + ${userStat.index}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+								<div class="modal-dialog modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+										<div class="modal-title modal-title-css">修改用户信息</div>
+									</div>
+									<div class="modal-body div-left">
+										<div class="modal-content-font-css modal-margin-bottom">
+											用户ID：
+											<div class="modal-content-css" style="user-select: text;" th:text="${user.id}"></div>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											用户名：
+											<input type="text" class="modal-content-css modal-input-css" th:value="${user.username}"/>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											密码：　
+											<input type="password" class="modal-content-css modal-input-css" th:value="${user.password}"/>
+										</div>
+										<div class="modal-content-font-css">
+											账号类型：
+											<select class="modal-select-css">
+												<option class="modal-content-css" th:text="${user.accountType == '管理员' ? '管理员' : '普通用户'}" selected></option>
+												<option class="modal-content-css" th:text="${user.accountType == '管理员' ? '普通用户' : '管理员'}"></option>
+											</select>
+										</div>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-primary modal-button-css" th:onclick="'updateUser(\'' + ${userStat.index} + '\')'">修改</button>
+									</div>
+								</div>
+							</div>
+							<div class="manage-button-css" th:onclick="'deleteUser(\'' + ${userStat.index} + '\')'">删除</div>
+						</div>
+					</div>
+				</div>
+				<div class="manage-content-none-css" th:if="${session.userList == null || session.userList.size() == 0}">暂无用户信息</div>
+			</div>
+			<div class="manage-content-whole-css tab-pane fade" id="hotlist-platform">
+				<div id="hotlist-platform-content" th:if="${session.hotListList != null && session.hotListList.size() > 0}">
+					<div>
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 div-left cursor-default padding-none-css">
+							<div class="manage-search-css">
+								<input type="text" class="manage-search-input-css" placeholder="请输入检索关键字..."/>
+								<i class="glyphicon glyphicon-search" onclick="search(1)"></i>
+							</div>
+							<div class="manage-add-css" data-toggle="modal" data-target="#hotlist-add">添加平台</div>
+						</div>
+						<div class="modal fade" id="hotlist-add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+							<div class="modal-dialog modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+									<div class="modal-title modal-title-css">添加平台</div>
+								</div>
+								<div class="modal-body div-left">
+									<div class="modal-content-font-css modal-margin-bottom">
+										平台名：　
+										<input type="text" class="modal-content-css modal-input-css"/>
+									</div>
+									<div class="modal-content-font-css">
+										平台地址：
+										<input type="text" class="modal-content-css modal-input-css"/>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-primary modal-button-css" onclick="addHotList()">添加</button>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-2 col-sm-2 col-md-1 col-lg-1 div-center cursor-default manage-content-font-css border-top-left-css">序号</div>
+						<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 div-center cursor-default manage-content-font-css">平台名</div>
+						<div class="col-xs-5 col-sm-5 col-md-6 col-lg-6 div-center cursor-default manage-content-font-css">平台地址</div>
+						<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 div-center cursor-default manage-content-font-css border-top-right-css">操作</div>
+					</div>
+					<div class="manage-content-css" th:each="hotList, hotListStat : ${session.hotListList}" hidden="hidden">
+						<div th:class="'col-xs-2 col-sm-2 col-md-1 col-lg-1 div-center cursor-default manage-content-font-css' + ${hotListStat.index == hotListStat.size - 1 ? ' border-bottom-left-css' : ''}" th:text="${hotListStat.index + 1}"></div>
+						<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 div-center cursor-default manage-content-font-css" th:text="${hotList.hotListName}"></div>
+						<div class="col-xs-5 col-sm-5 col-md-6 col-lg-6 div-left cursor-default manage-content-font-css" th:text="${hotList.hotListUrl}"></div>
+						<div th:class="'col-xs-2 col-sm-2 col-md-2 col-lg-2 div-center cursor-default manage-button-whole-css' + ${hotListStat.index == hotListStat.size - 1 ? ' border-bottom-right-css' : ''}">
+							<div class="manage-button-css" data-toggle="modal" th:data-target="'#hotlist-detail-' + ${hotListStat.index}">详细</div>
+							<div class="modal fade" th:id="'hotlist-detail-' + ${hotListStat.index}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+								<div class="modal-dialog modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+										<div class="modal-title modal-title-css">详细内容</div>
+									</div>
+									<div class="modal-body div-left">
+										<div class="modal-content-font-css modal-margin-bottom">
+											平台序号：
+											<div class="modal-content-css" style="user-select: text;" th:text="${hotList.id}"></div>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											平台名：
+											<div class="modal-content-css" style="user-select: text;" th:text="${hotList.hotListName}"></div>
+										</div>
+										<div class="modal-content-font-css">
+											平台地址：
+											<div class="modal-content-css" style="user-select: text;" th:text="${hotList.hotListUrl}"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="manage-button-css" data-toggle="modal" th:data-target="'#hotlist-update-' + ${hotListStat.index}">修改</div>
+							<div class="modal fade" th:id="'hotlist-update-' + ${hotListStat.index}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+								<div class="modal-dialog modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+										<div class="modal-title modal-title-css">修改平台信息</div>
+									</div>
+									<div class="modal-body div-left">
+										<div class="modal-content-font-css modal-margin-bottom">
+											平台序号：
+											<div class="modal-content-css" style="user-select: text;" th:text="${hotList.id}"></div>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											平台名：　
+											<input type="text" class="modal-content-css modal-input-css" th:value="${hotList.hotListName}"/>
+										</div>
+										<div class="modal-content-font-css">
+											平台地址：
+											<input type="text" class="modal-content-css modal-input-css" th:value="${hotList.hotListUrl}"/>
+										</div>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-primary modal-button-css" th:onclick="'updateHotList(\'' + ${hotListStat.index} + '\')'">修改</button>
+									</div>
+								</div>
+							</div>
+							<div class="manage-button-css" th:onclick="'deleteHotList(\'' + ${hotListStat.index} + '\')'">删除</div>
+						</div>
+					</div>
+				</div>
+				<div class="manage-content-none-css" th:if="${session.hotListList == null || session.hotListList.size() == 0}">暂无平台信息</div>
+			</div>
+			<div class="manage-content-whole-css tab-pane fade" id="hotlist-content">
+				<div id="hotlist-content-content" th:if="${session.hotListDataList != null && session.hotListDataList.size() > 0}">
+					<div>
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 div-left cursor-default padding-none-css">
+							<div class="manage-search-css">
+								<input type="text" class="manage-search-input-css" placeholder="请输入检索关键字..."/>
+								<i class="glyphicon glyphicon-search" onclick="search(2)"></i>
+							</div>
+							<div class="manage-add-css" data-toggle="modal" data-target="#hotlist-data-add">添加热点</div>
+						</div>
+						<div class="modal fade" id="hotlist-data-add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+							<div class="modal-dialog modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+									<div class="modal-title modal-title-css">添加热点</div>
+								</div>
+								<div class="modal-body div-left">
+									<div class="modal-content-font-css modal-margin-bottom">
+										热点ID：　　　
+										<input type="text" class="modal-content-css modal-input-css"/>
+									</div>
+									<div class="modal-content-font-css modal-margin-bottom">
+										热点地址：　　
+										<input type="text" class="modal-content-css modal-input-css"/>
+									</div>
+									<div class="modal-content-font-css modal-margin-bottom">
+										热点标题：　　
+										<input type="text" class="modal-content-css modal-input-css"/>
+									</div>
+									<div class="modal-content-font-css modal-margin-bottom">
+										热点副标题：　
+										<input type="text" class="modal-content-css modal-input-css"/>
+									</div>
+									<div class="modal-content-font-css modal-margin-bottom">
+										热点热度：　　
+										<input type="text" class="modal-content-css modal-input-css"/>
+									</div>
+									<div class="modal-content-font-css modal-margin-bottom">
+										热点图片地址：
+										<input type="text" class="modal-content-css modal-input-css"/>
+									</div>
+									<div class="modal-content-font-css">
+										热点所属平台：
+										<select class="modal-select-css">
+											<option class="modal-content-css" th:each="hotList: ${session.hotListList}" th:text="${hotList.hotListName}"></option>
+										</select>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-primary modal-button-css" onclick="addHotListData()">添加</button>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 div-center cursor-default manage-content-font-css border-top-left-css">序号</div>
+						<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 div-center cursor-default manage-content-font-css">热点地址</div>
+						<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 div-center cursor-default manage-content-font-css">热点标题</div>
+						<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 div-center cursor-default manage-content-font-css">热点副标题</div>
+						<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 div-center cursor-default manage-content-font-css">热点热度</div>
+						<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 div-center cursor-default manage-content-font-css">热点图片地址</div>
+						<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 div-center cursor-default manage-content-font-css">热点所属平台</div>
+						<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 div-center cursor-default manage-content-font-css border-top-right-css">操作</div>
+					</div>
+					<div class="manage-content-css" th:each="hotListData, hotListDataStat : ${session.hotListDataList}" hidden="hidden">
+						<div th:class="'col-xs-1 col-sm-1 col-md-1 col-lg-1 div-center cursor-default manage-content-font-css' + ${hotListDataStat.index == hotListDataStat.size - 1 ? ' border-bottom-left-css' : ''}" th:text="${hotListDataStat.index + 1}"></div>
+						<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 div-left cursor-default manage-content-font-css" th:text="${hotListData.hotListDataUrl}"></div>
+						<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 div-left cursor-default manage-content-font-css" th:text="${hotListData.hotListDataTitle}"></div>
+						<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 div-left cursor-default manage-content-font-css" th:text="${hotListData.hotListDataSubTitle}"></div>
+						<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 div-center cursor-default manage-content-font-css" th:text="${hotListData.hotListDataHeat}"></div>
+						<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 div-left cursor-default manage-content-font-css" th:text="${hotListData.hotListDataImageUrl}"></div>
+						<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 div-center cursor-default manage-content-font-css" th:text="${hotListData.hotListName}"></div>
+						<div th:class="'col-xs-1 col-sm-1 col-md-1 col-lg-1 div-center cursor-default manage-button-whole-css' + ${hotListDataStat.index == hotListDataStat.size - 1 ? ' border-bottom-right-css' : ''}">
+							<div class="manage-button-css" data-toggle="modal" th:data-target="'#hotlist-data-detail-' + ${hotListDataStat.index}">详细</div>
+							<div class="modal fade" th:id="'hotlist-data-detail-' + ${hotListDataStat.index}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+								<div class="modal-dialog modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+										<div class="modal-title modal-title-css">详细内容</div>
+									</div>
+									<div class="modal-body div-left">
+										<div class="modal-content-font-css modal-margin-bottom">
+											热点序号：
+											<div class="modal-content-css" style="user-select: text;" th:text="${hotListData.id}"></div>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											热点ID：
+											<div class="modal-content-css" style="user-select: text;" th:text="${hotListData.hotListDataId}"></div>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											热点地址：
+											<div class="modal-content-css" style="user-select: text;" th:text="${hotListData.hotListDataUrl}"></div>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											热点标题：
+											<div class="modal-content-css" style="user-select: text;" th:text="${hotListData.hotListDataTitle}"></div>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											热点副标题：
+											<div class="modal-content-css" style="user-select: text;" th:text="${hotListData.hotListDataSubTitle}"></div>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											热点热度：
+											<div class="modal-content-css" style="user-select: text;" th:text="${hotListData.hotListDataHeat}"></div>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											热点图片地址：
+											<div class="modal-content-css" style="user-select: text;" th:text="${hotListData.hotListDataImageUrl}"></div>
+										</div>
+										<div class="modal-content-font-css">
+											热点所属平台：
+											<div class="modal-content-css" style="user-select: text;" th:text="${hotListData.hotListName}"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="manage-button-css" data-toggle="modal" th:data-target="'#hotlist-data-update-' + ${hotListDataStat.index}">修改</div>
+							<div class="modal fade" th:id="'hotlist-data-update-' + ${hotListDataStat.index}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+								<div class="modal-dialog modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+										<div class="modal-title modal-title-css">修改热点信息</div>
+									</div>
+									<div class="modal-body div-left">
+										<div class="modal-content-font-css modal-margin-bottom">
+											热点序号：　　
+											<div class="modal-content-css" th:text="${hotListData.id}"></div>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											热点ID：　　　
+											<input type="text" class="modal-content-css modal-input-css" th:value="${hotListData.hotListDataId}"/>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											热点地址：　　
+											<input type="text" class="modal-content-css modal-input-css" th:value="${hotListData.hotListDataUrl}"/>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											热点标题：　　
+											<input type="text" class="modal-content-css modal-input-css" th:value="${hotListData.hotListDataTitle}"/>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											热点副标题：　
+											<input type="text" class="modal-content-css modal-input-css" th:value="${hotListData.hotListDataSubTitle}"/>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											热点热度：　　
+											<input type="text" class="modal-content-css modal-input-css" th:value="${hotListData.hotListDataHeat}"/>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											热点图片地址：
+											<input type="text" class="modal-content-css modal-input-css" th:value="${hotListData.hotListDataImageUrl}"/>
+										</div>
+										<div class="modal-content-font-css">
+											热点所属平台：
+											<select class="modal-select-css">
+												<option class="modal-content-css" th:text="${hotListData.hotListName}" selected></option>
+												<option class="modal-content-css" th:each="hotList: ${session.hotListList}" th:text="${hotList.hotListName}" th:if="${hotList.hotListName != hotListData.hotListName}"></option>
+											</select>
+										</div>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-primary modal-button-css" th:onclick="'updateHotListData(\'' + ${hotListDataStat.index} + '\')'">修改</button>
+									</div>
+								</div>
+							</div>
+							<div class="manage-button-css" th:onclick="'deleteHotListData(\'' + ${hotListDataStat.index} + '\')'">删除</div>
+						</div>
+					</div>
+				</div>
+				<div class="manage-content-none-css" th:if="${session.hotListDataList == null || session.hotListDataList.size() == 0}">暂无热点信息</div>
+			</div>
+			<div class="manage-content-whole-css tab-pane fade" id="subscribe">
+				<div id="subscribe-content" th:if="${session.subscribeList != null && session.subscribeList.size() > 0}">
+					<div>
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 div-left cursor-default padding-none-css">
+							<div class="manage-search-css">
+								<input type="text" class="manage-search-input-css" placeholder="请输入检索关键字..."/>
+								<i class="glyphicon glyphicon-search" onclick="search(3)"></i>
+							</div>
+							<div class="manage-add-css" data-toggle="modal" data-target="#subscribe-add">添加订阅</div>
+						</div>
+						<div class="modal fade" id="subscribe-add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+							<div class="modal-dialog modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+									<div class="modal-title modal-title-css">添加订阅</div>
+								</div>
+								<div class="modal-body div-left">
+									<div class="modal-content-font-css modal-margin-bottom">
+										平台名：　　
+										<select class="modal-select-css">
+											<option class="modal-content-css" th:each="hotList: ${session.hotListList}" th:text="${hotList.hotListName}"></option>
+										</select>
+									</div>
+									<div class="modal-content-font-css">
+										订阅用户ID：
+										<select class="modal-select-css">
+											<option class="modal-content-css" th:each="user: ${session.userList}" th:text="${user.id}"></option>
+										</select>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-primary modal-button-css" onclick="addSubscribe()">添加</button>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-2 col-sm-2 col-md-1 col-lg-1 div-center cursor-default manage-content-font-css border-top-left-css">序号</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 div-center cursor-default manage-content-font-css">平台名</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 div-center cursor-default manage-content-font-css">订阅用户ID</div>
+						<div class="col-xs-2 col-sm-2 col-md-3 col-lg-3 div-center cursor-default manage-content-font-css border-top-right-css">操作</div>
+					</div>
+					<div class="manage-content-css" th:each="subscribe, subscribeStat : ${session.subscribeList}" hidden="hidden">
+						<div th:class="'col-xs-2 col-sm-2 col-md-1 col-lg-1 div-center cursor-default manage-content-font-css' + ${subscribeStat.index == subscribeStat.size - 1 ? ' border-bottom-left-css' : ''}" th:text="${subscribeStat.index + 1}"></div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 div-center cursor-default manage-content-font-css" th:text="${subscribe.hotListName}"></div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 div-center cursor-default manage-content-font-css" th:text="${subscribe.userId}"></div>
+						<div th:class="'col-xs-2 col-sm-2 col-md-3 col-lg-3 div-center cursor-default manage-button-whole-css' + ${subscribeStat.index == subscribeStat.size - 1 ? ' border-bottom-right-css' : ''}">
+							<div class="manage-button-css" data-toggle="modal" th:data-target="'#subscribe-detail-' + ${subscribeStat.index}">详细</div>
+							<div class="modal fade" th:id="'subscribe-detail-' + ${subscribeStat.index}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+								<div class="modal-dialog modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+										<div class="modal-title modal-title-css">详细内容</div>
+									</div>
+									<div class="modal-body div-left">
+										<div class="modal-content-font-css modal-margin-bottom">
+											订阅序号：
+											<div class="modal-content-css" style="user-select: text;" th:text="${subscribe.id}"></div>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											平台名：
+											<div class="modal-content-css" style="user-select: text;" th:text="${subscribe.hotListName}"></div>
+										</div>
+										<div class="modal-content-font-css">
+											订阅用户ID：
+											<div class="modal-content-css" style="user-select: text;" th:text="${subscribe.userId}"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="manage-button-css" data-toggle="modal" th:data-target="'#subscribe-update-' + ${subscribeStat.index}">修改</div>
+							<div class="modal fade" th:id="'subscribe-update-' + ${subscribeStat.index}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+								<div class="modal-dialog modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+										<div class="modal-title modal-title-css">修改订阅信息</div>
+									</div>
+									<div class="modal-body div-left">
+										<div class="modal-content-font-css modal-margin-bottom">
+											订阅序号：　
+											<div class="modal-content-css" th:text="${subscribe.id}"></div>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											平台名：　　
+											<select class="modal-select-css">
+												<option class="modal-content-css" th:text="${subscribe.hotListName}" selected></option>
+												<option class="modal-content-css" th:each="hotList: ${session.hotListList}" th:text="${hotList.hotListName}" th:if="${hotList.hotListName != subscribe.hotListName}"></option>
+											</select>
+										</div>
+										<div class="modal-content-font-css">
+											订阅用户ID：
+											<select class="modal-select-css">
+												<option class="modal-content-css" th:text="${subscribe.userId}" selected></option>
+												<option class="modal-content-css" th:each="user: ${session.userList}" th:text="${user.id}" th:if="${user.id != subscribe.userId}"></option>
+											</select>
+										</div>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-primary modal-button-css" th:onclick="'updateSubscribe(\'' + ${subscribeStat.index} + '\')'">修改</button>
+									</div>
+								</div>
+							</div>
+							<div class="manage-button-css" th:onclick="'deleteSubscribe(\'' + ${subscribeStat.index} + '\')'">删除</div>
+						</div>
+					</div>
+				</div>
+				<div class="manage-content-none-css" th:if="${session.subscribeList == null || session.subscribeList.size() == 0}">暂无订阅信息</div>
+			</div>
+			<div class="manage-content-whole-css tab-pane fade" id="feedback">
+				<div id="feedback-content" th:if="${session.feedbackList != null && session.feedbackList.size() > 0}">
+					<div>
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 div-left cursor-default padding-none-css">
+							<div class="manage-search-css">
+								<input type="text" class="manage-search-input-css" placeholder="请输入检索关键字..."/>
+								<i class="glyphicon glyphicon-search" onclick="search(4)"></i>
+							</div>
+							<div class="manage-add-css" data-toggle="modal" data-target="#feedback-add">添加反馈</div>
+						</div>
+						<div class="modal fade" id="feedback-add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+							<div class="modal-dialog modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+									<div class="modal-title modal-title-css">添加反馈</div>
+								</div>
+								<div class="modal-body div-left">
+									<div class="modal-content-font-css modal-margin-bottom">
+										反馈标题：　
+										<input type="text" class="modal-content-css modal-input-css"/>
+									</div>
+									<div class="modal-content-font-css modal-margin-bottom">
+										反馈内容：　
+										<input type="text" class="modal-content-css modal-input-css"/>
+									</div>
+									<div class="modal-content-font-css">
+										订阅用户ID：
+										<select class="modal-select-css">
+											<option class="modal-content-css" th:each="user: ${session.userList}" th:text="${user.id}"></option>
+										</select>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-primary modal-button-css" onclick="addFeedback()">添加</button>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-2 col-sm-2 col-md-1 col-lg-1 div-center cursor-default manage-content-font-css border-top-left-css">序号</div>
+						<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 div-center cursor-default manage-content-font-css">反馈标题</div>
+						<div class="col-xs-3 col-sm-3 col-md-4 col-lg-4 div-center cursor-default manage-content-font-css">反馈内容</div>
+						<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 div-center cursor-default manage-content-font-css">反馈用户ID</div>
+						<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 div-center cursor-default manage-content-font-css border-top-right-css">操作</div>
+					</div>
+					<div class="manage-content-css" th:each="feedback, feedbackStat : ${session.feedbackList}" hidden="hidden">
+						<div th:class="'col-xs-2 col-sm-2 col-md-1 col-lg-1 div-center cursor-default manage-content-font-css' + ${feedbackStat.index == feedbackStat.size - 1 ? ' border-bottom-left-css' : ''}" th:text="${feedbackStat.index + 1}"></div>
+						<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 div-left cursor-default manage-content-font-css" th:text="${feedback.feedbackTitle}"></div>
+						<div class="col-xs-3 col-sm-3 col-md-4 col-lg-4 div-left cursor-default manage-content-font-css" th:text="${feedback.feedbackContent}"></div>
+						<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 div-center cursor-default manage-content-font-css" th:text="${feedback.userId}"></div>
+						<div th:class="'col-xs-2 col-sm-2 col-md-2 col-lg-2 div-center cursor-default manage-button-whole-css' + ${feedbackStat.index == feedbackStat.size - 1 ? ' border-bottom-right-css' : ''}">
+							<div class="manage-button-css" data-toggle="modal" th:data-target="'#feedback-detail-' + ${feedbackStat.index}">详细</div>
+							<div class="modal fade" th:id="'feedback-detail-' + ${feedbackStat.index}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+								<div class="modal-dialog modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+										<div class="modal-title modal-title-css">详细内容</div>
+									</div>
+									<div class="modal-body div-left">
+										<div class="modal-content-font-css modal-margin-bottom">
+											反馈序号：
+											<div class="modal-content-css" style="user-select: text;" th:text="${feedback.id}"></div>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											反馈标题：
+											<div class="modal-content-css" style="user-select: text;" th:text="${feedback.feedbackTitle}"></div>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											反馈内容：
+											<div class="modal-content-css" style="user-select: text;" th:text="${feedback.feedbackContent}"></div>
+										</div>
+										<div class="modal-content-font-css">
+											反馈用户ID：
+											<div class="modal-content-css" style="user-select: text;" th:text="${feedback.userId}"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="manage-button-css" data-toggle="modal" th:data-target="'#feedback-update-' + ${feedbackStat.index}">修改</div>
+							<div class="modal fade" th:id="'feedback-update-' + ${feedbackStat.index}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+								<div class="modal-dialog modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+										<div class="modal-title modal-title-css">修改反馈信息</div>
+									</div>
+									<div class="modal-body div-left">
+										<div class="modal-content-font-css modal-margin-bottom">
+											反馈序号：　
+											<div class="modal-content-css" th:text="${feedback.id}"></div>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											反馈标题：　
+											<input type="text" class="modal-content-css modal-input-css" th:value="${feedback.feedbackTitle}"/>
+										</div>
+										<div class="modal-content-font-css modal-margin-bottom">
+											反馈内容：　
+											<input type="text" class="modal-content-css modal-input-css" th:value="${feedback.feedbackContent}"/>
+										</div>
+										<div class="modal-content-font-css">
+											订阅用户ID：
+											<select class="modal-select-css">
+												<option class="modal-content-css" th:text="${feedback.userId}" selected></option>
+												<option class="modal-content-css" th:each="user: ${session.userList}" th:text="${user.id}" th:if="${user.id != feedback.userId}"></option>
+											</select>
+										</div>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-primary modal-button-css" th:onclick="'updateFeedback(\'' + ${feedbackStat.index} + '\')'">修改</button>
+									</div>
+								</div>
+							</div>
+							<div class="manage-button-css" th:onclick="'deleteFeedback(\'' + ${feedbackStat.index} + '\')'">删除</div>
+						</div>
+					</div>
+				</div>
+				<div class="manage-content-none-css" th:if="${session.feedbackList == null || session.feedbackList.size() == 0}">暂无反馈信息</div>
+			</div>
+			<img class="scroll-top-css" th:src="@{/img/other/scroll_top.jpg}" onclick="manageScrollTop()" hidden="hidden"/>
+		</div>
+		<div class="container-fluid bottom-css">
+			<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 div-left cursor-default">
+				其实地上本没有路，走的人多了，也便成了路。
+			</div>
+			<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 div-right cursor-default">
+				——— 鲁迅 •《故乡》
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,183 @@
+body {
+    margin: 0 auto;
+    background-color: rgb(245, 245, 245);
+    position: relative;
+    height: 100vh;
+    min-height: 100vh;
+    width: 100%;
+    user-select: none;
+}
+
+.div-left {
+    text-align: left;
+}
+
+.div-center {
+    text-align: center;
+}
+
+.div-right {
+    text-align: right;
+}
+
+.cursor-default {
+    cursor: default;
+}
+
+.nav-css {
+    justify-content: center;
+    align-items: center;
+    display: -webkit-flex;
+    display: flex;
+    background-color: rgb(255, 255, 255);
+    padding: 1vh 5vw;
+}
+
+.nav-big-title-css {
+    background-color: rgb(255, 255, 255);
+    font-size: clamp(3.2vh, 3.2vh, 3rem);
+    border: none;
+}
+
+.dropdown-a-css {
+    border: none;
+    text-decoration: none;
+    color: black;
+    cursor: pointer;
+    text-align: center;
+}
+
+.dropdown-a-css:link {
+    border: none;
+    text-decoration: none;
+    color: black;
+}
+
+.dropdown-a-css:hover {
+    border: none;
+    text-decoration: none;
+    color: black;
+}
+
+.dropdown-a-css:active {
+    border: none;
+    text-decoration: none;
+    color: black;
+}
+
+.user-img-css {
+    width: 4.2vh;
+    height: 4.2vh;
+    border-radius: 50%;
+    background-color: rgb(245, 245, 245);
+    cursor: pointer;
+}
+
+.dropdown-menu {
+    min-width: 100%;
+    text-align: center;
+    padding: 1vh;
+}
+
+.button-css {
+    width: auto;
+    height: auto;
+    border: none;
+    background: none;
+    color: black;
+    font-size: 2.3vh;
+    padding: 0.6vh 1.2vh;
+}
+
+.button-css:link {
+    border: none;
+    box-shadow: none;
+    color: black;
+}
+
+.button-css:hover {
+    border: none;
+    box-shadow: none;
+    color: rgb(24, 136, 255);
+    background-color: rgb(245, 245, 245);
+    border-radius: 4px;
+}
+
+.button-css:active {
+    border: none;
+    box-shadow: none;
+    color: rgb(24, 136, 255);
+}
+
+.text-whole-css {
+    width: calc(40vw + 10vh);
+    height: calc(30vh + 10vw);
+    background-color: rgb(255, 255, 255);
+    border-radius: 6px;
+    margin: 20vh auto;
+}
+
+.text-padding-top {
+    padding-top: calc(2vh + 3vw);
+}
+
+.text-font-css {
+    font-size: 2.5vh;
+    font-family: "Microsoft YaHei";
+    margin-top: 4vh;
+}
+
+.text-css {
+    outline: none;
+    border-radius: 6px;
+    background: rgb(255, 255, 255);
+    border: 2px solid rgb(245, 245, 245);
+    width: 50%;
+}
+
+.text-css:hover {
+    box-shadow: 0 0 2px 2px #f1f1f1;
+}
+
+.button-font-css {
+    font-family: "Microsoft YaHei";
+    margin-top: 5vh;
+}
+
+.button-login-css {
+    color: black;
+    background-color: rgb(245, 245, 245);
+    border: none;
+    border-radius: 6px;
+    width: auto;
+    height: auto;
+    font-size: 2.5vh;
+    padding: 0.8vh 1.6vh;
+}
+
+.button-login-css:hover {
+    color: black;
+    background-color: rgb(245, 245, 245);
+}
+
+.button-login-css:active {
+    color: rgb(24, 136, 255);
+    background-color: rgb(245, 245, 245);
+}
+
+.button-login-css.active {
+    color: rgb(24, 136, 255);
+    background-color: rgb(245, 245, 245);
+}
+
+.bottom-css {
+    justify-content: center;
+    align-items: center;
+    display: -webkit-flex;
+    background-color: rgb(255, 255, 255);
+    padding: 1vh 5vw;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    font-size: 1.8vh;
+}

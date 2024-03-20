@@ -1,0 +1,280 @@
+body {
+    margin: 0 auto;
+    background-color: rgb(245, 245, 245);
+    position: relative;
+    height: 100vh;
+    min-height: 100vh;
+    width: 100%;
+    user-select: none;
+}
+
+.div-left {
+    text-align: left;
+}
+
+.div-center {
+    text-align: center;
+}
+
+.div-right {
+    text-align: right;
+}
+
+.cursor-default {
+    cursor: default;
+}
+
+.nav-css {
+    justify-content: center;
+    align-items: center;
+    display: -webkit-flex;
+    display: flex;
+    background-color: rgb(255, 255, 255);
+    padding: 1vh 5vw;
+}
+
+.nav-big-title-css {
+    background-color: rgb(255, 255, 255);
+    font-size: clamp(3.2vh, 3.2vh, 3rem);
+    border: none;
+}
+
+.float-left {
+    float: left;
+}
+
+.float-right {
+    float: right;
+}
+
+.title-css {
+    border: none;
+    text-decoration: none;
+    font-size: clamp(2.5vh, 2.5vh, 3rem);
+    font-family: "Microsoft YaHei";
+    color: black;
+    background-color: rgb(255, 255, 255);
+    border-radius: 4px;
+    margin-left: 1vw;
+    padding: 0.6vh 1.2vh;
+}
+
+.title-css:link {
+    border: none;
+    text-decoration: none;
+    color: black;
+}
+
+.title-css:hover {
+    border: none;
+    text-decoration: none;
+    color: black;
+    background-color: rgb(245, 245, 245);
+}
+
+.title-css:active {
+    border: none;
+    text-decoration: none;
+    color: rgb(24, 136, 255);
+    background-color: rgb(245, 245, 245);
+}
+
+.title-css.active {
+    border: none;
+    text-decoration: none;
+    color: rgb(24, 136, 255);
+    background-color: rgb(245, 245, 245);
+}
+
+.dropdown-a-css {
+    border: none;
+    text-decoration: none;
+    color: black;
+    cursor: pointer;
+    text-align: center;
+}
+
+.dropdown-a-css:link {
+    border: none;
+    text-decoration: none;
+    color: black;
+}
+
+.dropdown-a-css:hover {
+    border: none;
+    text-decoration: none;
+    color: black;
+}
+
+.dropdown-a-css:active {
+    border: none;
+    text-decoration: none;
+    color: black;
+}
+
+.user-img-css {
+    width: 4.2vh;
+    height: 4.2vh;
+    border-radius: 50%;
+    background-color: rgb(245, 245, 245);
+    cursor: pointer;
+}
+
+.user-username-css {
+    width: 4.5vh;
+    height: 4.5vh;
+    background-color: rgb(245, 245, 245);
+    border-radius: 50%;
+    line-height: 4vh;
+    font-size: 2.3vh;
+    font-family: "Microsoft YaHei";
+}
+
+.dropdown-menu {
+    min-width: 100%;
+    text-align: center;
+    padding: 1vh;
+}
+
+.margin-bottom {
+    margin-bottom: 1vh;
+}
+
+.button-css {
+    width: auto;
+    height: auto;
+    border: none;
+    background: none;
+    color: black;
+    font-size: 2.3vh;
+    padding: 0.6vh 1.2vh;
+}
+
+.button-css:link {
+    border: none;
+    box-shadow: none;
+    color: black;
+}
+
+.button-css:hover {
+    border: none;
+    box-shadow: none;
+    color: rgb(24, 136, 255);
+    background-color: rgb(245, 245, 245);
+    border-radius: 4px;
+}
+
+.button-css:active {
+    border: none;
+    box-shadow: none;
+    color: rgb(24, 136, 255);
+}
+
+.text-whole-css {
+    background-color: rgb(255, 255, 255);
+    font-family: "Microsoft YaHei";
+    border-radius: 6px;
+    margin: 3vh 5vw;
+    padding: 2vh;
+    height: 83vh;
+}
+
+.text-title-css {
+    font-size: 3vh;
+}
+
+.text-font-css {
+    font-size: 2.5vh;
+    margin-top: 5vh;
+    margin-left: 5vw;
+}
+
+.text-css {
+    outline: none;
+    border-radius: 6px;
+    background: rgb(255, 255, 255);
+    border: 2px solid rgb(245, 245, 245);
+    width: calc(12vh + 12vw);
+}
+
+.text-css:hover {
+    box-shadow: 0 0 2px 2px #f1f1f1;
+}
+
+.button-update-css {
+    width: auto;
+    height: auto;
+    border: none;
+    font-size: 2.3vh;
+    color: black;
+    background-color: rgb(245, 245, 245);
+    border-radius: 4px;
+    padding: 0.5vh 1.5vh;
+}
+
+.button-update-css:hover {
+    color: black;
+    background-color: rgb(245, 245, 245);
+}
+
+.button-update-css:active {
+    color: rgb(24, 136, 255);
+    background-color: rgb(245, 245, 245);
+}
+
+.text-margin-top {
+    margin-top: 5vh;
+}
+
+.feedback-content-whole-css {
+    color: black;
+    font-family: "Microsoft YaHei";
+    border: 2px solid rgb(245, 245, 245);
+    border-radius: 6px;
+    margin-top: 3vh;
+    padding: 2vh;
+    width: 100%;
+    height: 45%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+}
+
+.feedback-content-top-css {
+    font-size: 2.5vh;
+}
+
+.feedback-content-css {
+    font-size: 2.2vh;
+    margin-top: 1vh;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.feedback-button-css {
+    font-size: 2.2vh;
+    background-color: rgb(245, 245, 245);
+    border: none;
+    border-radius: 4px;
+    margin-top: 1vh;
+    padding: calc(0.2vh + 0.2vw) calc(0.6vh + 0.6vw);
+}
+
+.feedback-button-css:active {
+    color: rgb(24, 136, 255);
+    background-color: rgb(245, 245, 245);
+}
+
+.bottom-css {
+    justify-content: center;
+    align-items: center;
+    display: -webkit-flex;
+    background-color: rgb(255, 255, 255);
+    padding: 1vh 5vw;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    font-size: 1.8vh;
+}

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dailyhotlist.mapper.SubscribeMapper">
+    <resultMap id="subscribeList" type="com.dailyhotlist.model.Subscribe">
+        <id property="id" column="id"/>
+        <result property="hotListName" column="hotlist_name"/>
+        <result property="userId" column="user_id"/>
+        <collection property="hotListDataList" ofType="com.dailyhotlist.model.HotListData">
+            <id property="id" column="hd_id"/>
+            <result property="hotListDataId" column="hotlist_data_id"/>
+            <result property="hotListDataUrl" column="hotlist_data_url"/>
+            <result property="hotListDataTitle" column="hotlist_data_title"/>
+            <result property="hotListDataSubTitle" column="hotlist_data_sub_title"/>
+            <result property="hotListDataHeat" column="hotlist_data_heat"/>
+            <result property="hotListDataImageUrl" column="hotlist_data_image_url"/>
+            <result property="hotListName" column="hotlist_name"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectSubscribeByUserId" resultMap="subscribeList">
+        select s.*,
+               hd.id as hd_id,
+               hd.hotlist_data_id,
+               hd.hotlist_data_url,
+               hd.hotlist_data_title,
+               hd.hotlist_data_sub_title,
+               hd.hotlist_data_heat,
+               hd.hotlist_data_image_url,
+               hd.hotlist_name
+        from subscribe s
+                 left join hotlist_data hd on s.hotlist_name = hd.hotlist_name
+        where s.user_id = #{userId};
+    </select>
+
+    <insert id="insertSubscribe">
+        insert into subscribe(hotlist_name, user_id)
+        values (#{hotListName}, #{userId});
+    </insert>
+
+    <update id="closeForeignKey">
+        set foreign_key_checks = 0;
+    </update>
+
+    <delete id="deleteSubscribeByHotListNameAndUserId">
+        delete
+        from subscribe
+        where hotlist_name = #{hotListName}
+          and user_id = #{userId};
+    </delete>
+
+    <update id="resetAutoIncrement">
+        alter table subscribe
+            auto_increment = 1;
+    </update>
+
+    <update id="openForeignKey">
+        set foreign_key_checks = 1;
+    </update>
+
+    <select id="selectAllSubscribe" resultMap="subscribeList">
+        select *
+        from subscribe;
+    </select>
+
+    <select id="selectOneSubscribe" resultMap="subscribeList">
+        select *
+        from subscribe
+        where user_id = #{userId}
+          and hotlist_name = #{hotListName};
+    </select>
+
+    <update id="updateOneSubscribe">
+        update subscribe
+        set hotlist_name = #{hotListName},
+            user_id      = #{userId}
+        where id = #{id};
+    </update>
+
+    <delete id="deleteOneSubscribe">
+        delete
+        from subscribe
+        where id = #{id};
+    </delete>
+</mapper>

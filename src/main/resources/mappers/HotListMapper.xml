@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dailyhotlist.mapper.HotListMapper">
+    <resultMap id="hotListList" type="com.dailyhotlist.model.HotList">
+        <id property="id" column="id"/>
+        <result property="hotListName" column="hotlist_name"/>
+        <result property="hotListUrl" column="hotlist_url"/>
+        <collection property="hotListDataList" ofType="com.dailyhotlist.model.HotListData">
+            <id property="id" column="hd_id"/>
+            <result property="hotListDataId" column="hotlist_data_id"/>
+            <result property="hotListDataUrl" column="hotlist_data_url"/>
+            <result property="hotListDataTitle" column="hotlist_data_title"/>
+            <result property="hotListDataSubTitle" column="hotlist_data_sub_title"/>
+            <result property="hotListDataHeat" column="hotlist_data_heat"/>
+            <result property="hotListDataImageUrl" column="hotlist_data_image_url"/>
+            <result property="hotListName" column="hotlist_name"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectHotList" resultMap="hotListList">
+        select h.*,
+               hd.id as hd_id,
+               hd.hotlist_data_id,
+               hd.hotlist_data_url,
+               hd.hotlist_data_title,
+               hd.hotlist_data_sub_title,
+               hd.hotlist_data_heat,
+               hd.hotlist_data_image_url,
+               hd.hotlist_name,
+               hd.id,
+               hd.hotlist_data_id,
+               hd.hotlist_data_url,
+               hd.hotlist_data_title,
+               hd.hotlist_data_sub_title,
+               hd.hotlist_data_heat,
+               hd.hotlist_data_image_url,
+               hd.hotlist_name
+        from hotlist h
+                 left join hotlist_data hd on h.hotlist_name = hd.hotlist_name;
+    </select>
+
+    <insert id="insertHotList">
+        insert into hotList(hotlist_name, hotlist_url)
+        values (#{hotListName}, #{hotListUrl});
+    </insert>
+
+    <delete id="deleteHotList">
+        delete
+        from hotlist;
+    </delete>
+
+    <select id="selectAllHotList" resultMap="hotListList">
+        select *
+        from hotlist;
+    </select>
+
+    <select id="selectOneHotList" resultMap="hotListList">
+        select *
+        from hotlist
+        where hotlist_name = #{hotListName};
+    </select>
+
+    <update id="updateHotList">
+        update hotlist
+        set hotlist_name = #{hotListName},
+            hotlist_url  = #{hotListUrl}
+        where id = #{id};
+    </update>
+
+    <delete id="deleteOneHotList">
+        delete
+        from hotlist
+        where id = #{id};
+    </delete>
+
+    <update id="closeForeignKey">
+        set foreign_key_checks = 0;
+    </update>
+
+    <update id="resetAutoIncrement">
+        alter table hotlist
+            auto_increment = 1;
+    </update>
+
+    <update id="openForeignKey">
+        set foreign_key_checks = 1;
+    </update>
+</mapper>

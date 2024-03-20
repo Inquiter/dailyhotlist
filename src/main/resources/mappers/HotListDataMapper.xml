@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dailyhotlist.mapper.HotListDataMapper">
+    <resultMap id="hotListDataList" type="com.dailyhotlist.model.HotListData">
+        <id property="id" column="id"/>
+        <result property="hotListDataId" column="hotlist_data_id"/>
+        <result property="hotListDataUrl" column="hotlist_data_url"/>
+        <result property="hotListDataTitle" column="hotlist_data_title"/>
+        <result property="hotListDataSubTitle" column="hotlist_data_sub_title"/>
+        <result property="hotListDataHeat" column="hotlist_data_heat"/>
+        <result property="hotListDataImageUrl" column="hotlist_data_image_url"/>
+        <result property="hotListName" column="hotlist_name"/>
+    </resultMap>
+
+    <select id="selectAllHotListData" resultMap="hotListDataList">
+        select *
+        from hotlist_data;
+    </select>
+
+    <select id="selectHotListDataByHotListName" resultMap="hotListDataList">
+        select *
+        from hotlist_data
+        where hotlist_name = #{hotListName};
+    </select>
+
+    <select id="selectOneHotListData" resultMap="hotListDataList">
+        select *
+        from hotlist_data
+        where hotlist_data_id = #{hotListDataId}
+          and hotlist_name = #{hotListName};
+    </select>
+
+    <insert id="insertHotListData">
+        insert into hotlist_data(hotlist_data_id, hotlist_data_url, hotlist_data_title, hotlist_data_sub_title, hotlist_data_heat,
+                                 hotlist_data_image_url, hotlist_name)
+        values (#{hotListDataId}, #{hotListDataUrl}, #{hotListDataTitle}, #{hotListDataSubTitle}, #{hotListDataHeat}, #{hotListDataImageUrl},
+                #{hotListName});
+    </insert>
+
+    <update id="updateHotListData">
+        update dailyhotlist.hotlist_data
+        set hotlist_data_id        = #{hotListDataId},
+            hotlist_data_url       = #{hotListDataUrl},
+            hotlist_data_title     = #{hotListDataTitle},
+            hotlist_data_sub_title = #{hotListDataSubTitle},
+            hotlist_data_heat      = #{hotListDataHeat},
+            hotlist_data_image_url = #{hotListDataImageUrl},
+            hotlist_name           = #{hotListName}
+        where id = #{id};
+    </update>
+
+    <delete id="deleteOneHotListData">
+        delete
+        from hotlist_data
+        where id = #{id};
+    </delete>
+
+    <delete id="deleteHotListData">
+        delete
+        from hotlist_data;
+    </delete>
+
+    <update id="closeForeignKey">
+        set foreign_key_checks = 0;
+    </update>
+
+    <update id="resetAutoIncrement">
+        alter table hotlist_data
+            auto_increment = 1;
+    </update>
+
+    <update id="openForeignKey">
+        set foreign_key_checks = 1;
+    </update>
+</mapper>

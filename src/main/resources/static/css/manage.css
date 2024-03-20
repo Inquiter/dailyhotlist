@@ -1,0 +1,513 @@
+body {
+    margin: 0 auto;
+    background-color: rgb(245, 245, 245);
+    position: relative;
+    height: 100vh;
+    min-height: 100vh;
+    width: 100%;
+    user-select: none;
+}
+
+.div-left {
+    text-align: left;
+}
+
+.div-center {
+    text-align: center;
+}
+
+.div-right {
+    text-align: right;
+}
+
+.cursor-default {
+    cursor: default;
+}
+
+.nav-css {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    background-color: rgb(255, 255, 255);
+    padding: 1vh 5vw;
+}
+
+.nav-big-title-css {
+    background-color: rgb(255, 255, 255);
+    font-size: clamp(3.2vh, 3.2vh, 3rem);
+    border: none;
+}
+
+.float-left {
+    float: left;
+}
+
+.float-right {
+    float: right;
+}
+
+.title-css {
+    border: none;
+    text-decoration: none;
+    font-size: clamp(2.5vh, 2.5vh, 3rem);
+    font-family: "Microsoft YaHei";
+    color: black;
+    background-color: rgb(255, 255, 255);
+    border-radius: 4px;
+    margin-left: 1vw;
+    padding: 0.6vh 1.2vh;
+}
+
+.title-css:link {
+    border: none;
+    text-decoration: none;
+    color: black;
+}
+
+.title-css:hover {
+    border: none;
+    text-decoration: none;
+    color: black;
+    background-color: rgb(245, 245, 245);
+}
+
+.title-css:active {
+    border: none;
+    text-decoration: none;
+    color: rgb(24, 136, 255);
+    background-color: rgb(245, 245, 245);
+}
+
+.title-css.active {
+    border: none;
+    text-decoration: none;
+    color: rgb(24, 136, 255);
+    background-color: rgb(245, 245, 245);
+}
+
+.dropdown-a-css {
+    border: none;
+    text-decoration: none;
+    color: black;
+    cursor: pointer;
+    text-align: center;
+}
+
+.dropdown-a-css:link {
+    border: none;
+    text-decoration: none;
+    color: black;
+}
+
+.dropdown-a-css:hover {
+    border: none;
+    text-decoration: none;
+    color: black;
+}
+
+.dropdown-a-css:active {
+    border: none;
+    text-decoration: none;
+    color: black;
+}
+
+.user-img-css {
+    width: 4.2vh;
+    height: 4.2vh;
+    border-radius: 50%;
+    background-color: rgb(245, 245, 245);
+    cursor: pointer;
+}
+
+.user-username-css {
+    width: 4.5vh;
+    height: 4.5vh;
+    background-color: rgb(245, 245, 245);
+    border-radius: 50%;
+    line-height: 4vh;
+    font-size: 2.3vh;
+    font-family: "Microsoft YaHei";
+}
+
+.dropdown-menu {
+    min-width: 100%;
+    text-align: center;
+    padding: 1vh;
+}
+
+.margin-bottom {
+    margin-bottom: 1vh;
+}
+
+.button-css {
+    width: auto;
+    height: auto;
+    border: none;
+    background: none;
+    color: black;
+    font-size: 2.3vh;
+    padding: 0.6vh 1.2vh;
+}
+
+.button-css:link {
+    border: none;
+    box-shadow: none;
+    color: black;
+}
+
+.button-css:hover {
+    border: none;
+    box-shadow: none;
+    color: rgb(24, 136, 255);
+    background-color: rgb(245, 245, 245);
+    border-radius: 4px;
+}
+
+.button-css:active {
+    border: none;
+    box-shadow: none;
+    color: rgb(24, 136, 255);
+}
+
+.padding-none-css {
+    padding: 0;
+}
+
+.manage-left-css {
+    color: black;
+    background-color: rgb(255, 255, 255);
+    font-size: 2.3vh;
+    font-family: "Microsoft YaHei";
+    border: 1px solid rgb(237, 237, 237);
+    height: 88.5vh;
+    padding: 1vh;
+}
+
+.manage-left-top-css {
+    font-size: 2.5vh;
+    border: none;
+    color: black;
+    background-color: rgb(255, 255, 255);
+}
+
+.manage-title-css {
+    color: black;
+    display: block;
+    width: 100%;
+    padding: 1vh 2vh;
+}
+
+.manage-title-css:link {
+    border: none;
+    box-shadow: none;
+    text-decoration: none;
+    color: black;
+}
+
+.manage-title-css:hover {
+    border: none;
+    box-shadow: none;
+    text-decoration: none;
+    color: black;
+    background-color: rgb(245, 245, 245);
+    border-radius: 4px;
+}
+
+.manage-title-css:active {
+    border: none;
+    box-shadow: none;
+    text-decoration: none;
+    color: rgb(24, 136, 255);
+    background-color: rgb(245, 245, 245);
+}
+
+.manage-title-css.active {
+    border: none;
+    box-shadow: none;
+    text-decoration: none;
+    color: rgb(24, 136, 255);
+    background-color: rgb(245, 245, 245);
+}
+
+.manage-title-margin-top {
+    margin-top: 1vh;
+}
+
+.manage-title-hotlist-css {
+    color: black;
+    display: block;
+    width: 100%;
+    padding: 1vh 2vh;
+}
+
+.manage-title-hotlist-css:link {
+    border: none;
+    box-shadow: none;
+    text-decoration: none;
+    color: black;
+}
+
+.manage-title-hotlist-css:hover {
+    border: none;
+    box-shadow: none;
+    text-decoration: none;
+    color: black;
+    background-color: rgb(245, 245, 245);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.manage-title-hotlist-css:active {
+    border: none;
+    box-shadow: none;
+    text-decoration: none;
+    color: rgb(24, 136, 255);
+    background-color: rgb(245, 245, 245);
+}
+
+.manage-title-hotlist-css.active {
+    border: none;
+    box-shadow: none;
+    text-decoration: none;
+    color: rgb(24, 136, 255);
+    background-color: rgb(245, 245, 245);
+}
+
+.hr-css {
+    color: rgb(245, 245, 245);
+    width: 70%;
+    margin: 1vh auto;
+}
+
+.manage-right-css {
+    color: black;
+    background-color: rgb(255, 255, 255);
+    font-size: 2.3vh;
+    font-family: "Microsoft YaHei";
+    border: 1px solid rgb(237, 237, 237);
+    height: 88.5vh;
+    overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-gutter: stable;
+    scroll-behavior: smooth;
+}
+
+.manage-content-whole-css {
+    color: black;
+    background-color: rgb(255, 255, 255);
+    font-size: 2.3vh;
+    font-family: "Microsoft YaHei";
+    padding: 1vh;
+    display: none;
+    width: 100vw;
+}
+
+.manage-content-font-css {
+    border: 1px solid rgb(237, 237, 237);
+    padding: 1vh;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 5.5vh;
+}
+
+.manage-add-css {
+    padding: 1vh 1.5vh;
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+    border: 1px solid rgb(237, 237, 237);
+    display: inline-block;
+    border-radius: 6px;
+    height: 5.5vh;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.manage-search-css {
+    padding: 1vh 1.5vh;
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+    border: 1px solid rgb(237, 237, 237);
+    display: inline-block;
+    border-radius: 6px;
+    height: 5.5vh;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.manage-search-input-css {
+    outline: none;
+    color: black;
+    border: none;
+    background-color: rgb(255, 255, 255);
+}
+
+.manage-search-input-css:hover {
+    color: black;
+    border: none;
+    border-radius: 4px;
+    box-shadow: 0 0 2px 2px #f1f1f1;
+}
+
+.manage-search-input-css:active {
+    color: black;
+    border: none;
+    border-radius: 4px;
+    box-shadow: 0 0 2px 2px #f1f1f1;
+}
+
+.glyphicon-search {
+    cursor: pointer;
+}
+
+.border-top-left-css {
+    border-top-left-radius: 4px;
+}
+
+.border-top-right-css {
+    border-top-right-radius: 4px;
+}
+
+.border-bottom-left-css {
+    border-bottom-left-radius: 4px;
+}
+
+.manage-button-whole-css {
+    border: 1px solid rgb(237, 237, 237);
+    padding: 0.5vh;
+    overflow-x: overlay;
+    overflow-y: hidden;
+    white-space: nowrap;
+    scrollbar-width: thin;
+    height: 5.5vh;
+}
+
+.border-bottom-right-css {
+    border-bottom-right-radius: 4px;
+}
+
+.manage-button-css {
+    background-color: rgb(245, 245, 245);
+    border-radius: 4px;
+    padding: 0.4vh 1.2vh;
+    display: inline-block;
+}
+
+.manage-button-css:hover {
+    cursor: pointer;
+}
+
+.modal-title-css {
+    font-size: 2.3vh;
+}
+
+.modal-content-font-css {
+    font-size: 2.2vh;
+    white-space: normal;
+}
+
+.modal-margin-bottom {
+    margin-bottom: 2vh;
+}
+
+.modal-content-css {
+    font-size: 2vh;
+    display: inline-block;
+}
+
+.modal-input-css {
+    outline: none;
+    border-radius: 6px;
+    background-color: rgb(255, 255, 255);
+    border: 2px solid rgb(245, 245, 245);
+    width: 50%;
+}
+
+.modal-input-css:hover {
+    box-shadow: 0 0 2px 2px #f1f1f1;
+}
+
+.modal-select-css {
+    border-radius: 6px;
+    background-color: rgb(255, 255, 255);
+    border: 2px solid rgb(245, 245, 245);
+}
+
+.modal-select-css:hover {
+    cursor: pointer;
+}
+
+.modal-button-css {
+    font-size: 2.3vh;
+    color: black;
+    background-color: rgb(245, 245, 245);
+    border: none;
+    box-shadow: 0 0 1px 1px rgb(200, 200, 200);
+}
+
+.modal-button-css:link {
+    color: black;
+    background-color: rgb(245, 245, 245);
+    border: none;
+}
+
+.modal-button-css:hover {
+    color: black;
+    background-color: rgb(245, 245, 245);
+    border: none;
+}
+
+.modal-button-css:active {
+    color: black;
+    background-color: rgb(245, 245, 245);
+    border: none;
+}
+
+.modal-button-css:focus {
+    color: black;
+    background-color: rgb(245, 245, 245);
+    border: none;
+}
+
+.btn-primary.active.focus, .btn-primary.active:focus, .btn-primary.active:hover, .btn-primary:active.focus, .btn-primary:active:focus, .btn-primary:active:hover, .open > .dropdown-toggle.btn-primary.focus, .open > .dropdown-toggle.btn-primary:focus, .open > .dropdown-toggle.btn-primary:hover {
+    color: black;
+    background-color: rgb(245, 245, 245);
+    border: none;
+    box-shadow: 0 0 1px 1px rgb(200, 200, 200);
+}
+
+.manage-content-none-css {
+    justify-content: center;
+    align-items: center;
+    display: -webkit-flex;
+    color: rgb(245, 245, 245);
+}
+
+#hotlist-content {
+    width: 200vw;
+}
+
+.scroll-top-css {
+    width: 3.5vh;
+    height: 3.5vh;
+    border-radius: 6px;
+    cursor: pointer;
+    position: fixed;
+    right: calc(1.5vh + 1.5vw);
+    margin-top: 80vh;
+}
+
+.bottom-css {
+    justify-content: center;
+    align-items: center;
+    display: -webkit-flex;
+    background-color: rgb(255, 255, 255);
+    padding: 1vh 5vw;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    font-size: 1.8vh;
+}

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<title>登录</title>
+		<meta charset="UTF-8">
+		<link rel="icon" type="image/x-icon" th:href="@{/img/ico/dailyhotlist.ico}"/>
+		<script type="text/javascript" th:src="@{/js/jquery-3.7.0.min.js}"></script>
+		<script type="text/javascript" th:src="@{/bootstrap-3.3.7-dist/js/bootstrap.min.js}"></script>
+		<link rel="stylesheet" th:href="@{/bootstrap-3.3.7-dist/css/bootstrap.min.css}">
+		<link rel="stylesheet" th:href="@{/css/login.css}"/>
+		<script th:inline="javascript">
+            window.onload = function () {
+                const userLoginMsg = '[[${userLoginMsg}]]'.replaceAll("\"", "");
+                if (userLoginMsg !== 'null')
+                    if (userLoginMsg.indexOf("不存在") !== -1) showMessage(userLoginMsg, 'danger');
+                    else showMessage(userLoginMsg, 'warning');
+            }
+
+            function showMessage(msg, type) {
+                const divElement = $("<div></div>").addClass('alert').addClass('alert-' + type).addClass('alert-dismissible').addClass('col-md-4');
+                divElement.css({
+                    "position": "absolute",
+                    "top": "5vh",
+                    "height": "6vh",
+                    "padding-top": "1.5vh",
+                    "border": "none",
+                    "text-align": "center",
+                    "background-color": type === "success" ? "rgb(218, 255, 206)" : type === "warning" ? "rgb(255, 252, 192)" : type === "danger" ? "rgb(255,183,183)" : "rgb(255, 255, 255)",
+                    "font-size": "2vh",
+                    "font-family": "Microsoft YaHei",
+                    "margin-left": "36vw",
+                });
+                divElement.text(msg);
+                $('body').append(divElement);
+                let isIn = false;
+                divElement.on({
+                    mouseover: function () {
+                        isIn = true;
+                    },
+                    mouseout: function () {
+                        isIn = false;
+                    }
+                });
+                setTimeout(function () {
+                    const IntervalMS = 30; //每次上浮的间隔毫秒
+                    const floatSpace = document.body.clientHeight * 0.03; //上浮的空间(vh)
+                    let nowTop = divElement.offset().top;   //获取元素当前的top值
+                    const stopTop = nowTop - floatSpace;    //上浮停止时的top值
+                    divElement.fadeOut(IntervalMS * floatSpace); //设置元素淡出
+                    let upFloat = setInterval(function () { //开始上浮
+                        if (nowTop >= stopTop) { //判断当前消息框top是否还在可上升的范围内
+                            divElement.css({"top": nowTop--}); //消息框的top上升1px
+                        } else {
+                            clearInterval(upFloat); //关闭上浮
+                            divElement.remove();    //移除元素
+                        }
+                    }, IntervalMS);
+                    if (isIn) { //如果鼠标在setTimeout之前已经放在的消息框中，则停止上浮
+                        clearInterval(upFloat);
+                        divElement.stop();
+                    }
+                    divElement.hover(function () { //鼠标悬浮时停止上浮和淡出效果，过后恢复
+                        clearInterval(upFloat);
+                        divElement.stop();
+                    }, function () {
+                        divElement.fadeOut(IntervalMS * (nowTop - stopTop)); // 这里设置元素淡出的时间应该为：间隔毫秒*剩余可以上浮空间
+                        upFloat = setInterval(function () { // 继续上浮
+                            if (nowTop >= stopTop) {
+                                divElement.css({"top": nowTop--});
+                            } else {
+                                clearInterval(upFloat); // 关闭上浮
+                                divElement.remove();    // 移除元素
+                            }
+                        }, IntervalMS);
+                    });
+                }, 2000);
+            }
+		</script>
+	</head>
+	<body>
+		<div class="container-fluid nav-css">
+			<div class="col-xs-4 col-sm-4 col-md-2 col-lg-1 div-left cursor-default">
+				<form action="/" method="post">
+					<input type="submit" class="nav-big-title-css" value="今日热榜"/>
+				</form>
+			</div>
+			<div class="col-xs-7 col-sm-7 col-md-9 col-lg-10 div-left cursor-default"></div>
+			<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 div-right cursor-default">
+				<div class="dropdown">
+					<a data-toggle="dropdown" href="#" class="dropdown-a-css">
+						<img th:src="@{/img/other/default_user.jpg}" class="user-img-css" draggable="false"/>
+					</a>
+					<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dLabel">
+						<li>
+							<form th:action="@{/user/register}" method="post">
+								<input type="submit" class="button-css" value="注册"/>
+							</form>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="container-fluid div-center text-whole-css">
+			<form th:action="@{/user/userLogin}" method="post">
+				<div class="text-font-css cursor-default text-padding-top">
+					用户名：<input type="text" class="text-css" name="username"/>
+				</div>
+				<div class="text-font-css cursor-default">
+					密码　：<input type="password" class="text-css" name="password"/>
+				</div>
+				<div class="button-font-css">
+					<input type="submit" class="button-login-css" value="登录"/>
+				</div>
+			</form>
+		</div>
+		<div class="container-fluid bottom-css">
+			<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 div-left cursor-default">
+				其实地上本没有路，走的人多了，也便成了路。
+			</div>
+			<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 div-right cursor-default">
+				——— 鲁迅 •《故乡》
+			</div>
+		</div>
+	</body>
+</html>

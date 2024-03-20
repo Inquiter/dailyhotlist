@@ -1,0 +1,756 @@
+body {
+    margin: 0 auto;
+    background-color: rgb(245, 245, 245);
+    position: relative;
+    height: 100vh;
+    min-height: 100vh;
+    width: 100%;
+    user-select: none;
+}
+
+.div-left {
+    text-align: left;
+}
+
+.div-center {
+    text-align: center;
+}
+
+.div-right {
+    text-align: right;
+}
+
+.cursor-default {
+    cursor: default;
+}
+
+.nav-css {
+    justify-content: center;
+    align-items: center;
+    display: -webkit-flex;
+    background-color: rgb(255, 255, 255);
+    padding: 1vh 5vw;
+}
+
+.nav-big-title-css {
+    background-color: rgb(255, 255, 255);
+    font-size: clamp(3.2vh, 3.2vh, 3rem);
+    border: none;
+}
+
+.float-left {
+    float: left;
+}
+
+.float-right {
+    float: right;
+}
+
+.title-css {
+    border: none;
+    text-decoration: none;
+    font-size: clamp(2.5vh, 2.5vh, 3rem);
+    font-family: "Microsoft YaHei";
+    color: black;
+    background-color: rgb(255, 255, 255);
+    border-radius: 4px;
+    margin-left: 1vw;
+    padding: 0.6vh 1.2vh;
+}
+
+.title-css:link {
+    border: none;
+    text-decoration: none;
+    color: black;
+}
+
+.title-css:hover {
+    border: none;
+    text-decoration: none;
+    color: black;
+    background-color: rgb(245, 245, 245);
+}
+
+.title-css:active {
+    border: none;
+    text-decoration: none;
+    color: rgb(24, 136, 255);
+    background-color: rgb(245, 245, 245);
+}
+
+.title-css.active {
+    border: none;
+    text-decoration: none;
+    color: rgb(24, 136, 255);
+    background-color: rgb(245, 245, 245);
+}
+
+.dropdown-a-css {
+    border: none;
+    text-decoration: none;
+    color: black;
+    cursor: pointer;
+    text-align: center;
+}
+
+.dropdown-a-css:link {
+    border: none;
+    text-decoration: none;
+    color: black;
+}
+
+.dropdown-a-css:hover {
+    border: none;
+    text-decoration: none;
+    color: black;
+}
+
+.dropdown-a-css:active {
+    border: none;
+    text-decoration: none;
+    color: black;
+}
+
+.user-img-css {
+    width: 4.2vh;
+    height: 4.2vh;
+    border-radius: 50%;
+    background-color: rgb(245, 245, 245);
+    cursor: pointer;
+}
+
+.user-username-css {
+    width: 4.5vh;
+    height: 4.5vh;
+    background-color: rgb(245, 245, 245);
+    border-radius: 50%;
+    line-height: 4vh;
+    font-size: 2.3vh;
+    font-family: "Microsoft YaHei";
+}
+
+.dropdown-menu {
+    min-width: 100%;
+    text-align: center;
+    padding: 1vh;
+}
+
+.margin-bottom {
+    margin-bottom: 1vh;
+}
+
+.button-css {
+    width: auto;
+    height: auto;
+    background: none;
+    border: none;
+    color: black;
+    font-size: 2.3vh;
+    padding: 0.6vh 1.2vh;
+}
+
+.button-css:link {
+    border: none;
+    box-shadow: none;
+    color: black;
+}
+
+.button-css:hover {
+    border: none;
+    box-shadow: none;
+    color: rgb(24, 136, 255);
+    background-color: rgb(245, 245, 245);
+    border-radius: 4px;
+}
+
+.button-css:active {
+    border: none;
+    box-shadow: none;
+    color: rgb(24, 136, 255);
+}
+
+.title-content-css {
+    background-color: rgb(255, 255, 255);
+    border-radius: 6px;
+    margin: 3vh 5vw;
+    padding: 2vh;
+    height: 83vh;
+}
+
+.hot-list-sub-title-whole-css {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px solid rgb(217, 217, 217);
+    padding-bottom: 2vh;
+    width: 100%;
+    height: auto;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    white-space: nowrap;
+    display: flex;
+}
+
+.hot-list-sub-title-css {
+    justify-content: center;
+    align-items: center;
+    display: -webkit-flex;
+    border: none;
+    text-decoration: none;
+    color: black;
+    font-size: 2.3vh;
+    font-family: "Microsoft YaHei";
+    border-radius: 4px;
+    margin-right: 1vh;
+    padding: 0.5vh 1vh;
+}
+
+.hot-list-sub-title-css:link {
+    border: none;
+    text-decoration: none;
+    color: black;
+}
+
+.hot-list-sub-title-css:hover {
+    border: none;
+    text-decoration: none;
+    color: black;
+    background-color: rgb(245, 245, 245);
+}
+
+.hot-list-sub-title-css:active {
+    border: none;
+    text-decoration: none;
+    color: black;
+    background-color: rgb(245, 245, 245);
+}
+
+.hot-list-sub-title-css.active {
+    border: none;
+    text-decoration: none;
+    color: black;
+    background-color: rgb(245, 245, 245);
+}
+
+.sub-title-ico-css {
+    border: none;
+    text-decoration: none;
+    text-align: center;
+    width: 2.3vh;
+    border-radius: 4px;
+}
+
+.hot-list-sub-title-content-whole-css {
+    border-top: none;
+    border-left: 1px solid rgb(237, 237, 237);
+    border-right: 1px solid rgb(237, 237, 237);
+    border-bottom: 1px solid rgb(237, 237, 237);
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    color: black;
+    width: 100%;
+    height: 91%;
+    overflow-x: hidden;
+    overflow-y: overlay;
+    scrollbar-width: thin;
+    scrollbar-gutter: stable;
+    scroll-behavior: smooth;
+}
+
+.hot-list-sub-title-content-css {
+    text-decoration: none;
+    border-radius: 12px;
+    cursor: default;
+    padding-top: 2vh;
+}
+
+.content-css {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+.content-id-css {
+    font-size: calc(1vh + 1vw);
+    color: rgb(134, 134, 134);
+}
+
+.content-title-css {
+    width: 100%;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: calc(0.9vh + 0.9vw);
+}
+
+.content-title-a-css {
+    font-weight: bold;
+    border: none;
+    text-decoration: none;
+    color: black;
+    cursor: pointer;
+}
+
+.content-title-a-css:link {
+    border: none;
+    text-decoration: none;
+    color: black;
+    cursor: pointer;
+}
+
+.content-title-a-css:visited {
+    border: none;
+    text-decoration: none;
+    color: black;
+}
+
+.content-title-a-css:hover {
+    border: none;
+    text-decoration: none;
+    color: rgb(24, 136, 255);
+}
+
+.content-title-a-css:active {
+    border: none;
+    text-decoration: none;
+    color: rgb(24, 136, 255);
+}
+
+.content-sub-title-css {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-size: calc(0.8vh + 0.8vw);
+    color: rgb(134, 134, 134);
+    margin-top: 1vh;
+}
+
+.content-heat-whole-css {
+    justify-content: left;
+    align-items: center;
+    display: -webkit-flex;
+    display: flex;
+    margin-top: 1vh;
+}
+
+.content-platform-css {
+    justify-content: center;
+    align-items: center;
+    display: -webkit-flex;
+    display: flex;
+    font-size: calc(0.7vh + 0.7vw);
+    color: rgb(134, 134, 134);
+    background-color: rgb(245, 245, 245);
+    padding: calc(0.15vh + 0.15vw) calc(0.3vh + 0.3vw);
+    margin-right: calc(0.4vh + 0.4vw);
+    border-radius: 4px;
+}
+
+.content-platform-ico-css {
+    border: none;
+    text-decoration: none;
+    width: calc(0.75vh + 0.75vw);
+    border-radius: 4px;
+    margin-right: calc(0.3vh + 0.3vw);
+}
+
+.content-heat-css {
+    font-size: calc(0.75vh + 0.75vw);
+    color: rgb(134, 134, 134);
+}
+
+.content-img-css {
+    width: 100%;
+    height: calc(5vh + 5vw);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.content-hr-css {
+    width: 100%;
+    color: rgb(134, 134, 134);
+}
+
+.hot-list-scroll-top-css {
+    width: 3.5vh;
+    height: 3.5vh;
+    border-radius: 6px;
+    cursor: pointer;
+    position: absolute;
+    right: calc(5vh + 6vw);
+    margin-top: calc(-5vh - 0.3vw);
+}
+
+#subscribe-content {
+    height: 100%;
+}
+
+.padding-none-css {
+    padding: 0;
+}
+
+.subscribe-sub-title-whole-css {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px solid rgb(217, 217, 217);
+    padding-bottom: 2vh;
+    width: 100%;
+    height: auto;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    white-space: nowrap;
+    display: flex;
+}
+
+.subscribe-sub-title-css {
+    justify-content: center;
+    align-items: center;
+    display: -webkit-flex;
+    border: none;
+    text-decoration: none;
+    color: black;
+    font-size: 2.3vh;
+    font-family: "Microsoft YaHei";
+    border-radius: 4px;
+    margin-right: 1vh;
+    padding: 0.5vh 1vh;
+}
+
+.subscribe-sub-title-css:link {
+    border: none;
+    text-decoration: none;
+    color: black;
+}
+
+.subscribe-sub-title-css:hover {
+    border: none;
+    text-decoration: none;
+    color: black;
+    background-color: rgb(245, 245, 245);
+}
+
+.subscribe-sub-title-css:active {
+    border: none;
+    text-decoration: none;
+    color: black;
+    background-color: rgb(245, 245, 245);
+}
+
+.subscribe-sub-title-css.active {
+    border: none;
+    text-decoration: none;
+    color: black;
+    background-color: rgb(245, 245, 245);
+}
+
+.subscribe-sub-title-none-css {
+    justify-content: center;
+    align-items: center;
+    display: -webkit-flex;
+    font-size: 2.3vh;
+    font-family: "Microsoft YaHei";
+    color: rgb(134, 134, 134);
+}
+
+.manage-subscribe-css {
+    color: rgb(255, 255, 255);
+    font-size: 2.2vh;
+    font-family: "Microsoft YaHei";
+    border-radius: 4px;
+    background-color: rgb(24, 136, 255);
+    display: inline-block;
+    padding: calc(0.4vh + 0.4vw) calc(0.8vh + 0.8vw);
+}
+
+.manage-subscribe-css:hover {
+    cursor: pointer;
+}
+
+.subscribe-sub-title-content-whole-css {
+    border: 1px solid rgb(237, 237, 237);
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    color: black;
+    width: 100%;
+    height: 92%;
+    overflow-x: hidden;
+    overflow-y: overlay;
+    scrollbar-width: thin;
+    scrollbar-gutter: stable;
+    scroll-behavior: smooth;
+}
+
+.subscribe-sub-title-content-css {
+    text-decoration: none;
+    border-radius: 12px;
+    cursor: default;
+    padding-top: 2vh;
+}
+
+.subscribe-content-none-css {
+    justify-content: center;
+    align-items: center;
+    display: -webkit-flex;
+    font-size: 2.3vh;
+    font-family: "Microsoft YaHei";
+    color: rgb(134, 134, 134);
+    margin-top: 34vh;
+}
+
+.subscribe-scroll-top-css {
+    width: 3.5vh;
+    height: 3.5vh;
+    border-radius: 6px;
+    cursor: pointer;
+    position: absolute;
+    right: calc(5vh + 6vw);
+    margin-top: calc(-5vh - 0.3vw);
+}
+
+.subscribe-manage-title-css {
+    color: black;
+    font-size: 2.3vh;
+    font-family: "Microsoft YaHei";
+    background-color: rgb(245, 245, 245);
+    border-radius: 4px;
+    display: inline-block;
+    margin: 1vh 0.8vh;
+    padding: 0.4vh 1.2vh;
+}
+
+.subscribe-manage-button-css {
+    color: rgb(255, 255, 255);
+    font-size: 2.3vh;
+    font-family: "Microsoft YaHei";
+    background-color: rgb(24, 136, 255);
+    border-radius: 4px;
+    display: inline-block;
+    margin: 1vh 0.8vh;
+    padding: 0.4vh 1.2vh;
+}
+
+.subscribe-manage-button-css:hover {
+    cursor: pointer;
+}
+
+#subscribe-manage {
+    height: 100%;
+}
+
+.subscribe-manage-top-half-css {
+    border: 1px solid rgb(237, 237, 237);
+    border-radius: 6px;
+    height: 49%;
+}
+
+.col-background-css {
+    background-color: rgb(245, 245, 245);
+}
+
+.display-none-css {
+    display: none;
+}
+
+#subscribe-manage-top-platform-whole {
+    display: inline-block;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-gutter: stable;
+    width: 100%;
+    height: calc(100% - 5.8523vh);
+}
+
+.subscribe-manage-platform-css {
+    color: rgb(255, 255, 255);
+    font-size: 2.2vh;
+    font-family: "Microsoft YaHei";
+    background-color: rgb(24, 136, 255);
+    border-radius: 4px;
+    display: inline-block;
+    padding: 0.8vh 1.6vh;
+    margin: 2vh 0 0 1vh;
+}
+
+.subscribe-manage-platform-css:hover {
+    cursor: pointer;
+}
+
+.subscribe-manage-top-half-ico-css {
+    color: rgb(255, 255, 255);
+    font-size: 2.2vh;
+    font-family: "Microsoft YaHei";
+    background-color: rgb(24, 136, 255);
+    margin-left: 0.5vh;
+}
+
+.subscribe-manage-platform-none-css {
+    justify-content: center;
+    align-items: center;
+    display: -webkit-flex;
+    font-size: 2.2vh;
+    font-family: "Microsoft YaHei";
+    color: rgb(134, 134, 134);
+    margin-top: 14vh;
+    width: 100%;
+}
+
+.subscribe-manage-bottom-half-css {
+    border: 1px solid rgb(237, 237, 237);
+    border-radius: 6px;
+    height: 49%;
+    margin-top: 2vh;
+}
+
+#subscribe-manage-bottom-platform-whole {
+    display: inline-block;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-gutter: stable;
+    width: 100%;
+    height: calc(100% - 5.8523vh);
+}
+
+.subscribe-manage-bottom-half-ico-css {
+    color: rgb(255, 255, 255);
+    font-size: 2.2vh;
+    font-family: "Microsoft YaHei";
+    background-color: rgb(24, 136, 255);
+    margin-left: 0.5vh;
+}
+
+.feedback-top-left-border-radius {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+.feedback-top-left-css {
+    color: black;
+    font-size: 2.3vh;
+    font-family: "Microsoft YaHei";
+    background-color: rgb(245, 245, 245);
+    border-radius: 4px;
+    display: inline-block;
+    margin: 1vh;
+    padding: 0.5vh 1vh;
+}
+
+.feedback-top-right-border-radius {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+.feedback-top-right-css {
+    color: rgb(255, 255, 255);
+    font-size: 2.3vh;
+    font-family: "Microsoft YaHei";
+    background-color: rgb(24, 136, 255);
+    border: none;
+    border-radius: 4px;
+    margin: 1vh;
+    padding: 0.5vh 1vh;
+}
+
+.feedback-margin-top-css {
+    margin-top: 2vh;
+}
+
+.feedback-title-font-css {
+    align-items: center;
+    display: -webkit-flex;
+    font-size: 2.3vh;
+    font-family: "Microsoft YaHei";
+    color: black;
+    background: rgb(255, 255, 255);
+}
+
+.feedback-title-height-css {
+    height: 6vh;
+}
+
+.feedback-title-css {
+    width: 100%;
+    height: 5vh;
+    outline: none;
+    border-radius: 6px;
+    border: 2px solid rgb(245, 245, 245);
+    font-size: 2.3vh;
+}
+
+.feedback-title-css:hover {
+    box-shadow: 0 0 1px 1px #f1f1f1;
+}
+
+.feedback-title-css::-webkit-input-placeholder {
+    font-size: 2vh;
+}
+
+.feedback-content-font-css {
+    display: -webkit-flex;
+    font-size: 2.3vh;
+    font-family: "Microsoft YaHei";
+    color: black;
+    background: rgb(255, 255, 255);
+}
+
+.feedback-content-height-css {
+    height: 72%;
+}
+
+.feedback-content-css {
+    width: 100%;
+    height: 100%;
+    outline: none;
+    border-radius: 6px;
+    border: 2px solid rgb(245, 245, 245);
+    font-size: 2.3vh;
+    resize: none;
+}
+
+.feedback-content-css:hover {
+    box-shadow: 0 0 1px 1px #f1f1f1;
+}
+
+.feedback-content-css::-webkit-input-placeholder {
+    font-size: 2vh;
+}
+
+.feedback-button-css {
+    justify-content: center;
+    align-items: center;
+    display: -webkit-flex;
+    color: rgb(255, 255, 255);
+    font-size: 2.3vh;
+    font-family: "Microsoft YaHei";
+    background-color: rgb(24, 136, 255);
+    border-radius: calc(0.25vh + 0.25vw);
+    width: calc(5vh + 5vw);
+    height: 5vh;
+    margin: 1.5vh auto;
+}
+
+.feedback-button-css:hover {
+    cursor: pointer;
+}
+
+.bottom-css {
+    justify-content: center;
+    align-items: center;
+    display: -webkit-flex;
+    background-color: rgb(255, 255, 255);
+    padding: 1vh 5vw;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    font-size: 1.8vh;
+}

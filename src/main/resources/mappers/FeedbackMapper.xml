@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dailyhotlist.mapper.FeedbackMapper">
+    <resultMap id="feedbackList" type="com.dailyhotlist.model.Feedback">
+        <id property="id" column="id"/>
+        <result property="feedbackTitle" column="feedback_title"/>
+        <result property="feedbackContent" column="feedback_content"/>
+        <result property="userId" column="user_id"/>
+    </resultMap>
+
+    <insert id="insertFeedback">
+        insert into feedback(feedback_title, feedback_content, user_id)
+        values (#{feedbackTitle}, #{feedbackContent}, #{userId});
+    </insert>
+
+    <select id="selectFeedbackByUserId" resultMap="feedbackList">
+        select *
+        from feedback
+        where user_id = #{userId};
+    </select>
+
+    <select id="selectAllFeedback" resultMap="feedbackList">
+        select *
+        from feedback;
+    </select>
+
+    <update id="updateOneFeedback">
+        update feedback
+        set feedback_title   = #{feedbackTitle},
+            feedback_content = #{feedbackContent},
+            user_id          = #{userId}
+        where id = #{id};
+    </update>
+
+    <delete id="deleteOneFeedback">
+        delete
+        from feedback
+        where id = #{id};
+    </delete>
+
+    <update id="closeForeignKey">
+        set foreign_key_checks = 0;
+    </update>
+
+    <update id="resetAutoIncrement">
+        alter table feedback
+            auto_increment = 1;
+    </update>
+
+    <update id="openForeignKey">
+        set foreign_key_checks = 1;
+    </update>
+</mapper>
