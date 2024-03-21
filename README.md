@@ -32,3 +32,8 @@
     2、然后找到dailyhotlist/src/main/resources/applicatioin.preperties文件，修改数据库的配置信息。
     3、之后找到dailyhotlist/dailyhotlist.sql文件，在数据库中运行此文件。
     4、最后在IDEA等开发软件中加载maven配置，然后启动就能使用了。
+    
+# 项目数据库
+    此项目使用的是云端数据库，数据库的配置在dailyhotlist/src/main/java/resources/application.properties文件中，可自行修改。
+
+## 项目声明：这是一个开源项目，禁止任何人商用此项目！违者必究！
