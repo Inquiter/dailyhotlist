@@ -416,6 +416,7 @@ body {
 .modal-content-css {
     font-size: 2vh;
     display: inline-block;
+    word-break: break-all;
 }
 
 .modal-input-css {
