@@ -36,7 +36,7 @@ public class HotListService {
 
     //每小时更新一次。
     //更新数据库中的dailyhotlist_hotlist表和dailyhotlist_hotlist_data表中的数据。
-    @Scheduled(cron = "0 42 0/1 * * ?")
+    @Scheduled(cron = "0 0 0/1 * * ?")
     public void initDatabaseHotListAndHotListData() {
         Date start = new Date();
         List<HotList> hotListList = selectHotListDataFromOnline();
@@ -352,11 +352,6 @@ public class HotListService {
                             hotListData.setHotListDataTitle(jsonObject.getString("title"));
                             hotListData.setHotListDataSubTitle(jsonObject.getString("summary"));
                             hotListData.setHotListDataHeat(jsonObject.getString("like_count").concat("热度"));
-                            imageUrl = "https://cdnfile.sspai.com/".concat(jsonObject.getString("banner")).concat("?imageMogr2/auto-orient/thumbnail/!800x400r/gravity/center/crop/800x400/format/webp/ignore-error/1");
-                            if (imageUrl.trim().length() > 0) {
-                                hotListData.setHotListDataImageUrl("src\\main\\resources\\static\\img\\hot_list_data\\".concat(hotList.getHotListName()).concat("-").concat(hotListData.getHotListDataId()).concat(".jpg"));
-                                downloadImage(imageUrl, hotListData);
-                            }
                             hotListData.setHotListName(hotList.getHotListName());
                             hotList.getHotListDataList().add(hotListData);
                         }
