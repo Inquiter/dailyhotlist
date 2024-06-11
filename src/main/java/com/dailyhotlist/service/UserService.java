@@ -60,7 +60,7 @@ public class UserService {
         hotListNameList.add("网易新闻");
         hotListNameList.add("澎湃新闻");
         hotListNameList.add("观风闻");
-        subscribeVoList.add(0, new SubscribeVo(0, "全部", "http://localhost:8080/", new ArrayList<>()));
+        subscribeVoList.add(0, new SubscribeVo(0, "全站", "http://localhost:8080/", new ArrayList<>()));
         List<HotListDataVo> hotListDataVoList = subscribeVoList.get(0).getHotListDataVoList();
         for (SubscribeVo subscribeVo : subscribeVoList)
             for (int i = 0; i < 100 / (subscribeVoList.size() - 1) && i < subscribeVo.getHotListDataVoList().size(); i++)
