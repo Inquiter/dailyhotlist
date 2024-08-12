@@ -5,9 +5,9 @@
 
 # 页面展示
 ## PC端
-![image](src\main\resources\static\img\other\网页端展示-PC端.png)
+![image](src\main\resources\static\img\other\网页端展示-PC端.jpg)
 ## 手机端
-![image](src\main\resources\static\img\other\网页端展示-手机端.png)
+![image](src\main\resources\static\img\other\网页端展示-手机端.jpg)
 
 # 项目介绍
     此项目用于实时获取新闻、资讯平台上的热榜数据。
