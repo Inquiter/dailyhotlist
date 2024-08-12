@@ -5,7 +5,7 @@
 
 # 页面展示
 ## PC端
-![image](src/main/resources/static/img/other/网页端展示-PC端.jpg)
+![image](src/main/resources/static/img/other//网页端展示-PC端.jpg)
 ## 手机端
 ![image](src/main/resources/static/img/other/网页端展示-手机端.jpg)
 
