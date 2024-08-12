@@ -3,6 +3,12 @@
 ### 作者：absdom
 ### 联系方式(QQ)：1572129487@qq.com
 
+# 页面展示
+## PC端
+![image](src\main\resources\static\img\other\网页端展示-PC端.png)
+## 手机端
+![image](src\main\resources\static\img\other\网页端展示-手机端.png)
+
 # 项目介绍
     此项目用于实时获取新闻、资讯平台上的热榜数据。
     前端采用HTML+BootStrap框架实现。
