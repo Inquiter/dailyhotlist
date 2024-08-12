@@ -56,7 +56,6 @@ public class UserController {
             else {
                 session.setAttribute("userLoginMsg", "登录成功!");
                 session.setAttribute("userVo", userVo);
-                System.out.println(userVo.getSubscribeVoList());
                 return "redirect:/";
             }
         }
